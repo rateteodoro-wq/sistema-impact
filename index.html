@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SISTEMA IMPACT — O Algoritmo da Execução</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* MANUTENÇÃO EXATA DA SUA IDENTIDADE VISUAL */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --gold: #D4A017; --gold-bright: #F5C518; --dark: #0A0A0A;
+      --card: #111111; --grid-line: rgba(212,160,23,0.08); --dim: #888888; --pad: 1.1rem;
+    }
+    body { background:var(--dark); color:#E8E8E8; font-family:'DM Sans',sans-serif; overflow-x:hidden;
+      background-image: linear-gradient(var(--grid-line) 1px,transparent 1px), linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+      background-size:36px 36px; }
+    nav { position:fixed; inset:0 0 auto 0; z-index:200; height:52px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 var(--pad); background:rgba(10,10,10,0.96); backdrop-filter:blur(14px); border-bottom:1px solid rgba(212,160,23,0.18); }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.16em; color:var(--gold-bright); }
+    .nav-links { display:none; gap:1.5rem; }
+    .nav-links a { font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .2s; }
+    .nav-links a:hover { color:var(--gold-bright); }
+    .hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--gold); border-radius:2px; }
+    .mobile-menu { display:none; position:fixed; top:52px; left:0; right:0; z-index:199; background:rgba(10,10,10,0.98);
+      border-bottom:1px solid rgba(212,160,23,0.18); padding:1.25rem var(--pad); flex-direction:column; gap:0; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--dim); text-decoration:none; padding:.85rem 0; border-bottom:1px solid rgba(212,160,23,0.1); }
+    .mobile-menu a:last-child { border-bottom:none; }
+    @media(min-width:640px){ :root{--pad:2rem;} .hamburger{display:none;} .nav-links{display:flex;} .mobile-menu{display:none!important;} }
+    .wrap { padding:3.5rem var(--pad); max-width:1200px; margin:0 auto; }
+    .slabel { font-family:'Share Tech Mono',monospace; font-size:.66rem; letter-spacing:.22em; color:var(--gold); text-transform:uppercase;
+      margin-bottom:.55rem; display:flex; align-items:center; gap:.55rem; }
+    .slabel::before { content:''; display:block; width:18px; height:1px; background:var(--gold); flex-shrink:0; }
+    .stitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.2rem,9vw,4.5rem); letter-spacing:.05em; line-height:1; color:#E8E8E8; }
+    .stitle span { color:var(--gold-bright); }
+    .sdesc { color:var(--dim); line-height:1.8; margin-top:.7rem; font-size:.91rem; max-width: 600px; }
+    hr.div { border:none; border-top:1px solid rgba(212,160,23,0.12); }
+    .fi { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .fi.on { opacity:1; transform:none; }
+    .hero { min-height:100svh; display:flex; align-items:center; padding:80px var(--pad) 3rem; position:relative; overflow:hidden; }
+    .hero-glow { position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(212,160,23,.1),transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; width:100%; max-width: 1200px; margin: 0 auto; }
+    .hero-badge { font-family:'Share Tech Mono',monospace; font-size:.63rem; letter-spacing:.18em; color:var(--gold); border:1px solid rgba(212,160,23,.4); padding:3px 10px; display:inline-block; margin-bottom:1.1rem; animation:up .6s ease both; }
+    h1.htitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(4.5rem,15vw,9rem); line-height:.9; color:var(--gold-bright); letter-spacing:.04em; text-shadow:0 0 80px rgba(212,160,23,.25); animation:up .6s .08s ease both; }
+    .hsub { font-family:'Bebas Neue',sans-serif; font-size:clamp(1rem,5vw,2rem); letter-spacing:.08em; color:#E8E8E8; margin-top:.35rem; animation:up .6s .15s ease both; }
+    .hsys { font-family:'Bebas Neue',sans-serif; font-size:clamp(.72rem,3.2vw,1rem); letter-spacing:.12em; color:rgba(212,160,23,.65); margin-top:.25rem; animation:up .6s .2s ease both; }
+    .hbody { font-size:clamp(.82rem,3.5vw,.97rem); color:var(--dim); line-height:1.75; margin-top:1.1rem; max-width:500px; animation:up .6s .27s ease both; }
+    .btn-p { display:inline-block; padding:13px 30px; background:var(--gold-bright); color:#0A0A0A; font-family:'Share Tech Mono',monospace; font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; text-decoration:none; font-weight:700; transition:all .22s; border: none; cursor: pointer; }
+    .btn-p:hover { background:#fff; box-shadow:0 0 28px rgba(245,197,24,.4); transform:translateY(-2px); }
+    .btn-o { display:inline-block; padding:13px 30px; border:1px solid rgba(212,160,23,.4); color:var(--gold); font-family:'Share Tech Mono',monospace; font-size:.8rem; letter-spacing:.16em; text-decoration:none; transition:all .22s; background: transparent; cursor: pointer; }
+    .btn-o:hover { border-color:var(--gold); background:rgba(212,160,23,.08); }
+    .hcounts { display:flex; gap:1.4rem; margin-top:2.8rem; flex-wrap:wrap; animation:up .6s .42s ease both; }
+    .hcdiv { width:1px; background:rgba(212,160,23,.2); align-self:stretch; }
+    .hcn { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--gold-bright); line-height:1; }
+    .hcl { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--dim); letter-spacing:.1em; margin-top:1px; }
+    .cgrid { display:grid; grid-template-columns:1fr; gap:.9rem; margin-top:2rem; }
+    @media(min-width:768px){ .cgrid-2{grid-template-columns:1fr 1fr;} .cgrid-2t .tall{grid-row:span 2;} }
+    .ccard { background:var(--card); border:1px solid rgba(212,160,23,.14); padding:1.35rem; position:relative; overflow:hidden; transition:border-color .3s,transform .3s; }
+    .ccard:hover { border-color:rgba(212,160,23,.45); transform:translateY(-3px); }
+    .ccard::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--gold-bright),transparent); opacity:0; transition:opacity .3s; }
+    .ccard:hover::before { opacity:1; }
+    .cnum { font-family:'Bebas Neue',sans-serif; font-size:4rem; line-height:1; color:rgba(212,160,23,.07); position:absolute; top:.6rem; right:1rem; letter-spacing:.05em; pointer-events:none; }
+    .ctag { font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:.17em; color:var(--gold); border:1px solid rgba(212,160,23,.3); padding:3px 8px; display:inline-block; margin-bottom:.8rem; }
+    .ctitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.35rem,5vw,1.75rem); letter-spacing:.06em; color:#E8E8E8; line-height:1.1; margin-bottom:.8rem; }
+    .cbody { color:var(--dim); font-size:.87rem; line-height:1.75; }
+    .kp { display:flex; align-items:flex-start; gap:.6rem; padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.05); }
+    .kp:last-child { border-bottom:none; }
+    .kpdot { width:6px; height:6px; background:var(--gold-bright); border-radius:50%; flex-shrink:0; margin-top:7px; }
+    .kpt { font-size:.84rem; color:#C0C0C0; line-height:1.6; }
+    .kpt strong { color:#E8E8E8; font-weight:500; }
+    .qt { border-left:3px solid var(--gold); padding:.85rem 1.1rem; background:rgba(212,160,23,.04); margin-top:1.1rem; }
+    .qtt { font-style:italic; color:#C0C0C0; font-size:.85rem; line-height:1.7; }
+    .qta { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--gold); margin-top:.35rem; letter-spacing:.09em; }
+    .formula-central { padding:1.1rem 1.4rem; background:rgba(212,160,23,.06); border:1px solid rgba(212,160,23,.22); border-left:3px solid var(--gold-bright); margin-top:1.6rem; display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; }
+    .formula-central-eq { font-family:'Bebas Neue',sans-serif; font-size:clamp(1rem,4vw,1.5rem); letter-spacing:.06em; color:var(--gold-bright); white-space:nowrap; }
+    .formula-central-label { font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:.12em; color:var(--gold); }
+    .formula-central-desc { font-size:.8rem; color:var(--dim); line-height:1.6; margin-top:.2rem; }
+    
+    /* ESTILOS ADICIONAIS PARA O HUB (Iframe e Forms) */
+    .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border: 1px solid rgba(212,160,23,.2); margin-top: 1rem; }
+    .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    .form-group { display: flex; gap: 10px; margin-top: 1.2rem; flex-wrap: wrap; }
+    .form-input { flex: 1; min-width: 220px; background: rgba(10,10,10,.8); border: 1px solid rgba(212,160,23,.3); color: #E8E8E8; padding: 13px 15px; font-family: 'DM Sans', sans-serif; font-size: .9rem; outline: none; transition: border-color .3s; }
+    .form-input:focus { border-color: var(--gold-bright); }
+    .form-input::placeholder { color: rgba(136, 136, 136, 0.6); }
+
+    @keyframes up { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:none;} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SISTEMA IMPACT</div>
+  <div class="nav-links">
+    <a href="#livro">O Livro</a>
+    <a href="#canal">YouTube</a>
+    <a href="#ensaios">Ensaios</a>
+    <a href="#autor">Sobre</a>
+  </div>
+  <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mmenu">
+  <a href="#livro" onclick="closeMenu()">O Livro (IMPACT)</a>
+  <a href="#canal" onclick="closeMenu()">YouTube</a>
+  <a href="#ensaios" onclick="closeMenu()">Ensaios / Newsletter</a>
+  <a href="#autor" onclick="closeMenu()">Sobre o Autor</a>
+</div>
+
+<!-- HERO PRINCIPAL -->
+<section class="hero" id="topo">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">HUB OPERACIONAL // V.2.0 // ONLINE</div>
+    <h1 class="htitle">SISTEMA IMPACT</h1>
+    <p class="hsub">O Algoritmo da Execução para o Caos Real</p>
+    <p class="hsys">Uma arquitetura de processos criada por Rodrigo Alex Teodoro</p>
+    <p class="hbody">Abandone a motivação vazia e comece a calcular suas decisões. O Sistema IMPACT é um protocolo de sobrevivência forjado nas trincheiras das licitações de alto risco. Explore a teoria base, assista às análises e integre o método.</p>
+    
+    <div style="display: flex; gap: 1rem; margin-top: 1.8rem; flex-wrap: wrap; animation:up .6s .34s ease both;">
+        <a href="#livro" class="btn-p">Conhecer o Sistema →</a>
+        <a href="#canal" class="btn-o">Ver Vídeos</a>
+    </div>
+
+    <!-- Mantive as contagens para dar autoridade -->
+    <div class="hcounts">
+      <div><div class="hcn">1</div><div class="hcl">Livro Publicado</div></div>
+      <div class="hcdiv"></div>
+      <div><div class="hcn">+10h</div><div class="hcl">Aulas no YouTube</div></div>
+      <div class="hcdiv"></div>
+      <div><div class="hcn">100%</div><div class="hcl">Gestão Baseada em Dados</div></div>
+    </div>
+  </div>
+</section>
+<hr class="div">
+
+<!-- O LIVRO -->
+<section id="livro"><div class="wrap">
+  <div class="slabel fi">A Teoria Base</div>
+  <h2 class="stitle fi">O LIVRO <span>IMPACT</span></h2>
+  <p class="sdesc fi">O manual definitivo para lidar com o bombardeio de demandas. Forjado nas trincheiras das licitações de alto risco, desenhado para quem não pode falhar.</p>
+  
+  <div class="cgrid cgrid-2 cgrid-2t">
+    <div class="ccard tall fi">
+      <span class="cnum">01</span><span class="ctag">O ALGORITMO DA EXECUÇÃO</span>
+      <h3 class="ctitle">Pare de tentar se motivar. Comece a calcular.</h3>
+      <p class="cbody">Não é um guia de arrumação. É um manifesto sobre a decisão — um algoritmo cru e funcional, operando à margem do seu humor ou de picos de motivação.</p>
+      
+      <div style="margin-top:1.2rem;">
+        <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>O Diagnóstico:</strong> Seu cérebro sofre ataques DDoS mentais diariamente. É um problema de arquitetura, não de preguiça.</p></div>
+        <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>A Captura:</strong> Extensão da memória de trabalho. Loops abertos matam a eficiência.</p></div>
+        <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>A Política da Produtividade:</strong> Como dizer não ao seu chefe usando matemática (Matriz GUT e RICE) ao invés de desculpas emocionais.</p></div>
+      </div>
+      
+      <div class="qt" style="margin-bottom: 1.5rem;"><p class="qtt">"O problema não é que a vida seja difícil. É enfrentar uma guerra nuclear armado com um canivete suíço e uma lista de tarefas num guardanapo."</p><p class="qta">— IMPACT, Capítulo 01</p></div>
+
+      <a href="https://amazon.com.br" target="_blank" class="btn-p">Adquirir na Amazon →</a>
+    </div>
+
+    <div class="ccard fi" style="transition-delay:.1s">
+      <span class="ctag">A FÓRMULA CENTRAL</span>
+      <h3 class="ctitle" style="font-size:clamp(1.2rem,4.5vw,1.5rem);">Metodologia IUCTE</h3>
+      <p class="cbody">No livro, revelo a exata calculadora para priorizar tarefas em contextos onde tudo parece ser para ontem.</p>
+      <div class="formula-central">
+        <div>
+          <div class="formula-central-label">SCORE DE PRIORIDADE</div>
+          <div class="formula-central-eq">Score = (I × U × C × T) ÷ E</div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div class="formula-central-desc">Impacto, Urgência, Confiança, Tendência divididos pelo Esforço. A matemática expurga a ansiedade da tomada de decisão.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ccard fi" style="transition-delay:.18s">
+      <span class="ctag">PARA QUEM É</span>
+      <h3 class="ctitle" style="font-size:clamp(1.2rem,4.5vw,1.5rem);">Critério de Compatibilidade</h3>
+      <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>SIM:</strong> Profissionais que lidam com múltiplas crises simultâneas e não podem cometer falhas estruturais.</p></div>
+      <div class="kp"><div class="kpdot" style="background:#FF6B6B;"></div><p class="kpt"><strong>NÃO:</strong> Pessoas buscando motivação, mantras energéticos ou organização de gavetas.</p></div>
+    </div>
+  </div>
+</div></section>
+<hr class="div">
+
+<!-- O CANAL / YOUTUBE -->
+<section id="canal"><div class="wrap">
+  <div class="slabel fi">Recurso Audiovisual</div>
+  <h2 class="stitle fi">O <span>CANAL</span></h2>
+  <p class="sdesc fi">Aulas abertas, revisões de sistemas e filosofia prática. Onde o pensamento analítico encontra a tecnologia do dia a dia.</p>
+  
+  <div class="cgrid cgrid-2">
+    <!-- Bloco de Vídeo Embedado -->
+    <div class="ccard fi" style="padding: 1rem;">
+      <span class="ctag" style="margin-left: 0.5rem; margin-top: 0.5rem;">SESSÃO MAIS RECENTE</span>
+      <div class="video-wrap">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/y7DZ6Kre3oY" title="Sessão Mais Recente" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <!-- Bloco de Texto do Canal -->
+    <div class="ccard fi" style="transition-delay:.1s">
+      <span class="cnum">02</span><span class="ctag">TRANSMISSÃO</span>
+      <h3 class="ctitle">Tecnologia, Produtividade & Ceticismo</h3>
+      <p class="cbody">Não esperem vídeos curtos com danças ou dicas superficiais em 30 segundos. O canal é um espaço para "Deep Work" intelectual.</p>
+      
+      <div style="margin-top:1.2rem;">
+        <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>Desmontando Softwares:</strong> Análise técnica de ferramentas como Notion, Obsidian e ecossistemas da Apple e Microsoft.</p></div>
+        <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>Filosofia da Execução:</strong> A aplicação de princípios do xadrez e pensamento sistêmico na resolução de gargalos reais.</p></div>
+      </div>
+      
+      <div style="margin-top: 2rem;">
+        <a href="https://www.youtube.com/@ImpactProdutividade" target="_blank" class="btn-o">Inscrever-se no Canal</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+<hr class="div">
+
+<!-- ENSAIOS / NEWSLETTER -->
+<section id="ensaios"><div class="wrap">
+  <div class="slabel fi">Comunicação Direta</div>
+  <h2 class="stitle fi">SINAL, NÃO <span>RUÍDO</span></h2>
+  <p class="sdesc fi">O algoritmo das redes sociais esconde textos densos. A caixa de entrada não. Assine para receber ensaios quinzenais sobre filosofia, produtividade e engenharia mental.</p>
+  
+  <div class="cgrid">
+    <div class="ccard fi" style="background: rgba(212,160,23,.03); border: 1px solid rgba(212,160,23,.3);">
+      <h3 class="ctitle" style="margin-bottom: 0.5rem;">Acesso ao Terminal (Newsletter)</h3>
+      <p class="cbody" style="max-width: 600px;">Textos puros. Sem spam. Reflexões sobre tomada de decisão e curadoria de ferramentas técnicas. Caso não goste, o descadastramento ocorre em um clique.</p>
+      
+      <!-- Se você usar Substack ou Beehiiv, você integrará o formulário (form action="...") deles aqui. -->
+      <form class="form-group" action="#" method="POST" onsubmit="event.preventDefault(); alert('Formulário pronto para receber integração (ex: Substack/Mailchimp)');">
+        <input type="email" class="form-input" placeholder="seu-melhor@email.com" required>
+        <button type="submit" class="btn-p">Habilitar Acesso</button>
+      </form>
+    </div>
+  </div>
+</div></section>
+<hr class="div">
+
+<!-- SOBRE O AUTOR -->
+<section id="autor"><div class="wrap">
+  <div class="slabel fi">Credencial Operacional</div>
+  <h2 class="stitle fi">O <span>ARQUITETO</span></h2>
+  
+  <div class="cgrid cgrid-2">
+    <div class="ccard fi">
+      <h3 class="ctitle" style="font-size:clamp(1.3rem,5vw,1.8rem);">Rodrigo Alex Teodoro</h3>
+      <p class="cbody" style="margin-bottom: 1rem;">Orçamentista Especializado em Licitações Técnicas, ex-enxadrista, apaixonado por filosofia e música.</p>
+      <p class="cbody">Minha visão sobre produtividade não nasceu na teoria corporativa, mas na tensão das licitações de alto risco — um ambiente impiedoso onde o erro não gera apenas "feedback ruim", mas prejuízos milionários. Em cenários assim, a motivação falha rapidamente. A única coisa que sustenta a execução de longo prazo é um **sistema matemático implacável**.</p>
+    </div>
+    
+    <div class="ccard fi" style="transition-delay:.1s">
+      <span class="ctag">PILARES PESSOAIS</span>
+      <h3 class="ctitle" style="font-size:clamp(1.2rem,4.5vw,1.5rem);">As Lentes Analíticas</h3>
+      
+      <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>O Tabuleiro (Xadrez):</strong> A vida não é sobre jogar rápido, é sobre antecipar a cascata de consequências das suas escolhas.</p></div>
+      <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>O Ceticismo (Filosofia):</strong> Duvide de qualquer método que prometa atalhos. Sistemas sólidos exigem fricção inicial e disciplina contínua.</p></div>
+      <div class="kp"><div class="kpdot"></div><p class="kpt"><strong>A Precisão (Engenharia):</strong> O problema não é você. O problema é a interface entre o seu cérebro e as suas ferramentas. Conserte a logística, e a execução emerge.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<footer>
+  <div class="flogo">SISTEMA IMPACT</div>
+  <div class="ft">© 2026 Rodrigo Alex Teodoro · Todos os direitos reservados.</div>
+  <div class="ft">INFRAESTRUTURA: VERCEL EDGE // PROTOCOLO HTTPS ATIVO</div>
+</footer>
+
+<script>
+  // Script do Menu Responsivo e Intersection Observer para Animações
+  const hbtn = document.getElementById('hbtn');
+  const mmenu = document.getElementById('mmenu');
+  hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
+  function closeMenu() { mmenu.classList.remove('open'); }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fi').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
