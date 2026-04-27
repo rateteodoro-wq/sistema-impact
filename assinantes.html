@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SISTEMA IMPACT — Central de Operações</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --gold: #D4A017; --gold-bright: #F5C518; --dark: #0A0A0A;
+      --card: #111111; --grid-line: rgba(212,160,23,0.08); --dim: #888888; --pad: 1.1rem;
+    }
+    body { background:var(--dark); color:#E8E8E8; font-family:'DM Sans',sans-serif; overflow-x:hidden;
+      background-image: linear-gradient(var(--grid-line) 1px,transparent 1px), linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+      background-size:36px 36px; }
+    nav { position:fixed; inset:0 0 auto 0; z-index:200; height:52px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 var(--pad); background:rgba(10,10,10,0.96); backdrop-filter:blur(14px); border-bottom:1px solid rgba(212,160,23,0.18); }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.16em; color:var(--gold-bright); }
+    .nav-links { display:none; gap:1.5rem; }
+    .nav-links a { font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .2s; }
+    .nav-links a:hover { color:var(--gold-bright); }
+    .hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--gold); border-radius:2px; }
+    .mobile-menu { display:none; position:fixed; top:52px; left:0; right:0; z-index:199; background:rgba(10,10,10,0.98);
+      border-bottom:1px solid rgba(212,160,23,0.18); padding:1.25rem var(--pad); flex-direction:column; gap:0; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--dim); text-decoration:none; padding:.85rem 0; border-bottom:1px solid rgba(212,160,23,0.1); }
+    .mobile-menu a:last-child { border-bottom:none; }
+    @media(min-width:640px){ :root{--pad:2rem;} .hamburger{display:none;} .nav-links{display:flex;} .mobile-menu{display:none!important;} }
+    .wrap { padding:3.5rem var(--pad); max-width:1200px; margin:0 auto; }
+    .slabel { font-family:'Share Tech Mono',monospace; font-size:.66rem; letter-spacing:.22em; color:var(--gold); text-transform:uppercase;
+      margin-bottom:.55rem; display:flex; align-items:center; gap:.55rem; }
+    .slabel::before { content:''; display:block; width:18px; height:1px; background:var(--gold); flex-shrink:0; }
+    .stitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.2rem,9vw,4.5rem); letter-spacing:.05em; line-height:1; color:#E8E8E8; }
+    .stitle span { color:var(--gold-bright); }
+    .sdesc { color:var(--dim); line-height:1.8; margin-top:.7rem; font-size:.91rem; max-width: 600px; }
+    hr.div { border:none; border-top:1px solid rgba(212,160,23,0.12); }
+    .hero { min-height:40svh; display:flex; align-items:center; padding:120px var(--pad) 3rem; position:relative; overflow:hidden; }
+    .hero-glow { position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(212,160,23,.15),transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; width:100%; max-width: 1200px; margin: 0 auto; text-align: center; }
+    .hero-badge { font-family:'Share Tech Mono',monospace; font-size:.63rem; letter-spacing:.18em; color:var(--gold-bright); border:1px solid rgba(212,160,23,.8); padding:4px 12px; display:inline-block; margin-bottom:1.1rem; background: rgba(212,160,23,.1); }
+    .htitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(3.5rem,10vw,6rem); line-height:.9; color:#E8E8E8; letter-spacing:.04em; }
+    .hbody { font-size:clamp(.82rem,3.5vw,.97rem); color:var(--dim); line-height:1.75; margin:1.1rem auto 0; max-width:550px; }
+    .btn-p { display:inline-block; padding:13px 30px; background:var(--gold-bright); color:#0A0A0A; font-family:'Share Tech Mono',monospace; font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; text-decoration:none; font-weight:700; transition:all .22s; border: none; cursor: pointer; text-align: center; }
+    .btn-p:hover { background:#fff; box-shadow:0 0 28px rgba(245,197,24,.4); transform:translateY(-2px); }
+    .btn-o { display:inline-block; padding:13px 30px; border:1px solid rgba(212,160,23,.4); color:var(--gold); font-family:'Share Tech Mono',monospace; font-size:.8rem; letter-spacing:.16em; text-decoration:none; transition:all .22s; background: rgba(10,10,10,.8); cursor: pointer; text-align: center; }
+    .btn-o:hover { border-color:var(--gold); background:rgba(212,160,23,.08); }
+    .cgrid { display:grid; grid-template-columns:1fr; gap:.9rem; margin-top:2rem; }
+    @media(min-width:768px){ .cgrid-2{grid-template-columns:1fr 1fr;} }
+    .ccard { background:var(--card); border:1px solid rgba(212,160,23,.14); padding:1.8rem; position:relative; overflow:hidden; transition:border-color .3s,transform .3s; display: flex; flex-direction: column; }
+    .ccard:hover { border-color:rgba(212,160,23,.45); transform:translateY(-3px); }
+    .ccard::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--gold-bright),transparent); opacity:0; transition:opacity .3s; }
+    .ccard:hover::before { opacity:1; }
+    .cnum { font-family:'Bebas Neue',sans-serif; font-size:4rem; line-height:1; color:rgba(212,160,23,.05); position:absolute; top:.6rem; right:1rem; letter-spacing:.05em; pointer-events:none; }
+    .ctag { font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:.17em; color:var(--gold); border:1px solid rgba(212,160,23,.3); padding:3px 8px; display:inline-block; margin-bottom:.8rem; align-self: flex-start; }
+    .ctitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.35rem,5vw,1.75rem); letter-spacing:.06em; color:#E8E8E8; line-height:1.1; margin-bottom:.8rem; }
+    .cbody { color:var(--dim); font-size:.87rem; line-height:1.75; flex-grow: 1; }
+    footer { border-top:1px solid rgba(212,160,23,.13); padding:1rem var(--pad); display:flex; flex-direction:column; gap:.4rem; align-items:center; text-align:center; margin-top: 3rem; }
+    @media(min-width:768px){ footer{flex-direction:row;justify-content:space-between;text-align:left;} }
+    .flogo { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--gold); letter-spacing:.15em; }
+    .ft    { font-family:'Share Tech Mono',monospace; font-size:.55rem; color:var(--gold); letter-spacing:.09em; line-height:1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SISTEMA IMPACT</div>
+  <div class="nav-links">
+    <a href="index.html">← Retornar à Base</a>
+    <a href="#ferramentas">Ferramentas</a>
+    <a href="#arquivos">Arquivos Confidenciais</a>
+    <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+  </div>
+  <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mmenu">
+  <a href="index.html" onclick="closeMenu()">← Retornar à Base</a>
+  <a href="#ferramentas" onclick="closeMenu()">Ferramentas</a>
+  <a href="#arquivos" onclick="closeMenu()">Arquivos Confidenciais</a>
+  <a href="#" onclick="closeMenu()" style="color: var(--gold-bright);">Desconectar</a>
+</div>
+
+<section class="hero" id="topo">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">ACESSO VERIFICADO // NÍVEL ALFA</div>
+    <h1 class="htitle">CENTRAL DE <span>OPERAÇÕES</span></h1>
+    <p class="hbody">Bem-vindo à área de assinantes. Todos os sistemas estão operacionais. Selecione uma das ferramentas abaixo para iniciar sua sessão.</p>
+  </div>
+</section>
+<hr class="div">
+
+<section id="ferramentas"><div class="wrap">
+  <div class="slabel">Módulos Ativos</div>
+  <h2 class="stitle">ARSENAL <span>IMPACT</span></h2>
+  <p class="sdesc">Ecossistema fechado de ferramentas estruturadas com IA e frameworks táticos.</p>
+  
+  <div class="cgrid cgrid-2">
+    <!-- Card 1: Knowledge Engine -->
+    <div class="ccard">
+      <span class="cnum">01</span><span class="ctag">IA // PRODUTIVIDADE</span>
+      <h3 class="ctitle">Knowledge Engine v4.0</h3>
+      <p class="cbody">Seu oráculo privado. O algoritmo que condensa horas de estudo em minutos. Processe degravações, resuma fluxos pesados e tenha assistência em engenharia mental baseada na API do Gemini Pro.</p>
+      <div style="margin-top: 1.5rem; display: flex; flex-direction: column;">
+        <a href="https://knowledge-enginev4-0.vercel.app/" target="_blank" class="btn-p">Iniciar Engine →</a>
+      </div>
+    </div>
+
+    <!-- Card 2: Notion Dashboard -->
+    <div class="ccard">
+      <span class="cnum">02</span><span class="ctag">SISTEMA // NOTION</span>
+      <h3 class="ctitle">Second Brain IMPACT</h3>
+      <p class="cbody">Sistema completo estruturado no Notion. O mesmo dashboard tático que substitui as dezenas de ferramentas espalhadas. Hub P.A.R.A, captura rápida e tracking de projetos.</p>
+      <div style="margin-top: 1.5rem; display: flex; flex-direction: column;">
+        <a href="#" target="_blank" class="btn-o">Acessar Template Notion</a>
+      </div>
+    </div>
+
+    <!-- Card 3: Calculadora IUCTE -->
+    <div class="ccard">
+      <span class="cnum">03</span><span class="ctag">APP // DECISÃO</span>
+      <h3 class="ctitle">Calculadora IUCTE Virtual</h3>
+      <p class="cbody">Pare de adivinhar o que fazer primeiro. Jogue suas tarefas na calculadora interativa baseada na Fórmula Central do livro e receba a sua Ordem de Execução Fria.</p>
+      <div style="margin-top: 1.5rem; display: flex; flex-direction: column;">
+        <a href="#" target="_blank" class="btn-o" style="opacity: 0.5;">Em Desenvolvimento...</a>
+      </div>
+    </div>
+    
+  </div>
+</div></section>
+<hr class="div">
+
+<section id="arquivos"><div class="wrap">
+  <div class="slabel">Centro de Inteligência</div>
+  <h2 class="stitle">ARQUIVOS & <span>AULAS</span></h2>
+  <p class="sdesc">Materiais brutos de pesquisa e acervo do canal exclusivos para a comunidade.</p>
+
+  <div class="cgrid">
+    <div class="ccard" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 1.2rem 1.8rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 class="ctitle" style="margin-bottom: 0.3rem;">[PDF] Mapa Mental - Diagnóstico de Bottlenecks</h3>
+        <p class="cbody" style="font-size: 0.8rem;">O infográfico gigante usado na Aula 03 do canal.</p>
+      </div>
+      <a href="#" class="btn-o" style="padding: 10px 20px; font-size: 0.7rem;">Baixar Arquivo</a>
+    </div>
+
+    <div class="ccard" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 1.2rem 1.8rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 class="ctitle" style="margin-bottom: 0.3rem;">[AULA EXTRA] Integrando Obsidian com o Knowledge Engine</h3>
+        <p class="cbody" style="font-size: 0.8rem;">Sessão fechada onde mostramos a ponte entre o seu local e a nuvem.</p>
+      </div>
+      <a href="#" class="btn-p" style="padding: 10px 20px; font-size: 0.7rem;">Assistir Aula</a>
+    </div>
+  </div>
+</div></section>
+
+<footer>
+  <div class="flogo">SISTEMA IMPACT</div>
+  <div class="ft">© 2026 Rodrigo Alex Teodoro · Operação Exclusiva.</div>
+  <div class="ft">INFRAESTRUTURA: VERCEL SECURE // STATUS: ONLINE</div>
+</footer>
+
+<script>
+  const hbtn = document.getElementById('hbtn');
+  const mmenu = document.getElementById('mmenu');
+  hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
+  function closeMenu() { mmenu.classList.remove('open'); }
+</script>
+</body>
+</html>
