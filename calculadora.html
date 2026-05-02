@@ -95,14 +95,14 @@
   <a href="assinantes.html" class="nav-logo">SISTEMA IMPACT</a>
   <div class="nav-links">
     <a href="assinantes.html">← Retornar aos Módulos</a>
-    <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+    <a href="#" onclick="logout()" style="color: var(--gold-bright);">Desconectar</a>
   </div>
   <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="mobile-menu" id="mmenu">
   <a href="assinantes.html">← Retornar aos Módulos</a>
-  <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+  <a href="#" onclick="logout(); closeMenu()" style="color: var(--gold-bright);">Desconectar</a>
 </div>
 
 <section class="hero">
@@ -242,6 +242,14 @@
   const mmenu = document.getElementById('mmenu');
   if(hbtn && mmenu) {
     hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
+  }
+
+  function closeMenu() { mmenu.classList.remove('open'); }
+
+  // Função de Desconectar (Limpeza de Cache Basic Auth)
+  function logout() {
+    // Tenta sobrescrever a senha salva no navegador e joga o usuário para a página inicial
+    window.location.href = window.location.protocol + '//sair:sair@' + window.location.host + '/index.html';
   }
 
   // Lógica da Calculadora IUCTE

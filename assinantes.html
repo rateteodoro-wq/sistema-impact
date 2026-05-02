@@ -73,7 +73,7 @@
     <a href="index.html">← Retornar à Base</a>
     <a href="#ferramentas">Ferramentas</a>
     <a href="#arquivos">Arquivos Confidenciais</a>
-    <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+    <a href="#" onclick="logout()" style="color: var(--gold-bright);">Desconectar</a>
   </div>
   <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -82,7 +82,7 @@
   <a href="index.html" onclick="closeMenu()">← Retornar à Base</a>
   <a href="#ferramentas" onclick="closeMenu()">Ferramentas</a>
   <a href="#arquivos" onclick="closeMenu()">Arquivos Confidenciais</a>
-  <a href="#" onclick="closeMenu()" style="color: var(--gold-bright);">Desconectar</a>
+  <a href="#" onclick="logout(); closeMenu()" style="color: var(--gold-bright);">Desconectar</a>
 </div>
 
 <section class="hero" id="topo">
@@ -170,6 +170,11 @@
   const mmenu = document.getElementById('mmenu');
   hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
   function closeMenu() { mmenu.classList.remove('open'); }
+
+  // Função de Desconectar (Limpeza de Cache Basic Auth)
+  function logout() {
+    window.location.href = window.location.protocol + '//sair:sair@' + window.location.host + '/index.html';
+  }
 </script>
 </body>
 </html>
