@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SISTEMA IMPACT — Calculadora IUCTE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --gold: #D4A017; --gold-bright: #F5C518; --dark: #0A0A0A;
+      --card: #111111; --grid-line: rgba(212,160,23,0.08); --dim: #888888; --pad: 1.1rem;
+    }
+    body { background:var(--dark); color:#E8E8E8; font-family:'DM Sans',sans-serif; overflow-x:hidden;
+      background-image: linear-gradient(var(--grid-line) 1px,transparent 1px), linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+      background-size:36px 36px; }
+    
+    /* Nav */
+    nav { position:fixed; inset:0 0 auto 0; z-index:200; height:52px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 var(--pad); background:rgba(10,10,10,0.96); backdrop-filter:blur(14px); border-bottom:1px solid rgba(212,160,23,0.18); }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.16em; color:var(--gold-bright); text-decoration: none; }
+    .nav-links { display:none; gap:1.5rem; }
+    .nav-links a { font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .2s; }
+    .nav-links a:hover { color:var(--gold-bright); }
+    .hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--gold); border-radius:2px; }
+    .mobile-menu { display:none; position:fixed; top:52px; left:0; right:0; z-index:199; background:rgba(10,10,10,0.98);
+      border-bottom:1px solid rgba(212,160,23,0.18); padding:1.25rem var(--pad); flex-direction:column; gap:0; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--dim); text-decoration:none; padding:.85rem 0; border-bottom:1px solid rgba(212,160,23,0.1); }
+    .mobile-menu a:last-child { border-bottom:none; }
+    @media(min-width:640px){ :root{--pad:2rem;} .hamburger{display:none;} .nav-links{display:flex;} .mobile-menu{display:none!important;} }
+    
+    /* Layout */
+    .wrap { padding:3.5rem var(--pad); max-width:1200px; margin:0 auto; }
+    hr.div { border:none; border-top:1px solid rgba(212,160,23,0.12); }
+    
+    .hero { padding: 100px var(--pad) 2rem; position:relative; overflow:hidden; }
+    .hero-glow { position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(212,160,23,.10),transparent 70%); pointer-events:none; }
+    .htitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,8vw,5rem); line-height:1; color:#E8E8E8; letter-spacing:.04em; }
+    .htitle span { color:var(--gold-bright); }
+    .hbody { font-size:clamp(.82rem,3.5vw,.97rem); color:var(--dim); line-height:1.75; margin-top: 1rem; max-width: 600px; }
+    
+    .layout-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-top: 2rem; }
+    @media(min-width:900px){ .layout-grid { grid-template-columns: 1fr 1fr; } }
+    
+    /* Box Styles */
+    .panel { background:var(--card); border:1px solid rgba(212,160,23,.14); padding:2rem; position:relative; }
+    .panel-title { font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; margin-bottom:1.5rem; border-bottom: 1px solid rgba(212,160,23,.1); padding-bottom: 0.8rem; }
+    
+    /* Calculator Styles */
+    .calc-row { margin-bottom: 1.8rem; }
+    .calc-label-wrap { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
+    .calc-label { font-family:'Bebas Neue',sans-serif; font-size: 1.4rem; color:#E8E8E8; letter-spacing: 0.05em; }
+    .calc-value { font-family:'Share Tech Mono',monospace; font-size: 1.2rem; color:var(--gold-bright); }
+    
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(212,160,23,.15); border-radius: 3px; border: 1px solid rgba(212,160,23,.2); }
+    input[type=range]::-webkit-slider-thumb { border: 1px solid var(--gold-bright); height: 20px; width: 20px; border-radius: 50%; background: var(--dark); cursor: pointer; -webkit-appearance: none; margin-top: -8px; box-shadow: 0 0 10px rgba(245,197,24,.3); transition: transform 0.1s; }
+    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); background: var(--gold-bright); }
+    input[type=range]::-moz-range-track { width: 100%; height: 6px; cursor: pointer; background: rgba(212,160,23,.15); border-radius: 3px; border: 1px solid rgba(212,160,23,.2); }
+    input[type=range]::-moz-range-thumb { border: 1px solid var(--gold-bright); height: 20px; width: 20px; border-radius: 50%; background: var(--dark); cursor: pointer; box-shadow: 0 0 10px rgba(245,197,24,.3); transition: transform 0.1s; }
+    input[type=range]::-moz-range-thumb:active { transform: scale(1.2); background: var(--gold-bright); }
+    
+    .score-box { background: rgba(10,10,10,.8); border: 1px solid var(--gold); padding: 2rem; text-align: center; margin-top: 2rem; position: relative; overflow: hidden; }
+    .score-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold-bright); }
+    .score-label { font-family:'Share Tech Mono',monospace; font-size:.8rem; letter-spacing:.2em; color:var(--dim); text-transform:uppercase; margin-bottom: 0.5rem; }
+    .score-value { font-family:'Bebas Neue',sans-serif; font-size: 5rem; color: #fff; line-height: 1; text-shadow: 0 0 20px rgba(245,197,24,.3); }
+    .score-formula { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--dim); margin-top: 1rem; }
+    
+    /* Support Content Styles */
+    .support-block { margin-bottom: 2rem; }
+    .support-title { font-family:'Bebas Neue',sans-serif; font-size: 1.3rem; color:var(--gold); letter-spacing: 0.05em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .support-text { font-size: 0.85rem; color: var(--dim); line-height: 1.6; }
+    .support-text strong { color: #E8E8E8; font-weight: 500; }
+    
+    .calib-table { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+    .calib-item { border-left: 2px solid var(--gold); padding-left: 1rem; }
+    .calib-item-title { font-family:'Share Tech Mono',monospace; font-size: 0.75rem; color: var(--gold-bright); text-transform: uppercase; margin-bottom: 0.2rem; }
+    .calib-item-desc { font-size: 0.8rem; color: var(--dim); line-height: 1.4; }
+    
+    footer { border-top:1px solid rgba(212,160,23,.13); padding:1rem var(--pad); display:flex; flex-direction:column; gap:.4rem; align-items:center; text-align:center; margin-top: 3rem; }
+    @media(min-width:768px){ footer{flex-direction:row;justify-content:space-between;text-align:left;} }
+    .flogo { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--gold); letter-spacing:.15em; }
+    .ft    { font-family:'Share Tech Mono',monospace; font-size:.55rem; color:var(--gold); letter-spacing:.09em; line-height:1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="assinantes.html" class="nav-logo">SISTEMA IMPACT</a>
+  <div class="nav-links">
+    <a href="assinantes.html">← Retornar aos Módulos</a>
+    <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+  </div>
+  <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mmenu">
+  <a href="assinantes.html">← Retornar aos Módulos</a>
+  <a href="#" style="color: var(--gold-bright);">Desconectar</a>
+</div>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap" style="padding-top: 0; padding-bottom: 0; position: relative; z-index: 1;">
+    <h1 class="htitle">CALCULADORA <span>IUCTE</span></h1>
+    <p class="hbody">Pare de adivinhar o que fazer primeiro. Utilize a matemática como régua para obter a Ordem de Execução Fria dos seus projetos e tarefas.</p>
+  </div>
+</section>
+
+<div class="wrap" style="padding-top: 0;">
+  <div class="layout-grid">
+    
+    <!-- Esquerda: Calculadora -->
+    <div class="panel">
+      <div class="panel-title" style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.05em; color:var(--gold-bright);">MÓDULO DE CÁLCULO TÁTICO</div>
+      
+      <div class="calc-row" style="margin-bottom: 2rem;">
+        <label for="task-name" style="font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; display:block; margin-bottom:0.5rem;">Nome / Descrição da Tarefa</label>
+        <input type="text" id="task-name" placeholder="Ex: Reescrever funil de vendas..." style="width: 100%; background: rgba(10,10,10,0.5); border: 1px solid rgba(212,160,23,0.3); padding: 12px 15px; color: #E8E8E8; font-family:'DM Sans',sans-serif; font-size: 0.95rem; border-radius: 4px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--gold-bright)'" onblur="this.style.borderColor='rgba(212,160,23,0.3)'">
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-label-wrap">
+          <label class="calc-label" for="val-i">Impacto (I)</label>
+          <span class="calc-value" id="disp-i">5</span>
+        </div>
+        <input type="range" id="val-i" min="1" max="10" value="5" oninput="calculate()">
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-label-wrap">
+          <label class="calc-label" for="val-u">Urgência (U)</label>
+          <span class="calc-value" id="disp-u">5</span>
+        </div>
+        <input type="range" id="val-u" min="1" max="10" value="5" oninput="calculate()">
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-label-wrap">
+          <label class="calc-label" for="val-c">Confiança (C)</label>
+          <span class="calc-value" id="disp-c">5</span>
+        </div>
+        <input type="range" id="val-c" min="1" max="10" value="5" oninput="calculate()">
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-label-wrap">
+          <label class="calc-label" for="val-t">Tendência (T)</label>
+          <span class="calc-value" id="disp-t">5</span>
+        </div>
+        <input type="range" id="val-t" min="1" max="10" value="5" oninput="calculate()">
+      </div>
+
+      <div class="calc-row" style="margin-top: 2.5rem;">
+        <div class="calc-label-wrap">
+          <label class="calc-label" for="val-e" style="color: var(--gold);">Esforço (E) — O Divisor</label>
+          <span class="calc-value" id="disp-e">5</span>
+        </div>
+        <input type="range" id="val-e" min="1" max="10" value="5" oninput="calculate()">
+      </div>
+
+      <div class="score-box">
+        <div class="score-label">Score Final</div>
+        <div class="score-value" id="disp-score">125.0</div>
+        <div class="score-formula">FÓRMULA: (I × U × C × T) ÷ E</div>
+      </div>
+    </div>
+
+    <!-- Direita: Instruções e Apoio -->
+    <div class="panel">
+      <div class="panel-title">Instruções de Preenchimento & Calibração</div>
+      
+      <div class="support-block">
+        <h3 class="support-title">A Régua de Medição</h3>
+        <p class="support-text">Para que a matemática funcione, você não pode chutar as notas. Use este padrão como referência para os extremos (1 e 10) e o ponto médio (5). Valores intermediários são bem-vindos:</p>
+        <div class="calib-table">
+          <div class="calib-item">
+            <div class="calib-item-title">Impacto</div>
+            <div class="calib-item-desc">(1) Irrelevante → (5) Melhora média → (10) Muda o jogo / Estrutural.</div>
+          </div>
+          <div class="calib-item">
+            <div class="calib-item-title">Urgência</div>
+            <div class="calib-item-desc">(1) Sem prazo → (5) Prazo nas próximas semanas → (10) Prazo é HOJE.</div>
+          </div>
+          <div class="calib-item">
+            <div class="calib-item-title">Confiança</div>
+            <div class="calib-item-desc">(1) Não sei fazer/Risco alto → (5) Sei o básico → (10) Domino o processo.</div>
+          </div>
+          <div class="calib-item">
+            <div class="calib-item-title">Tendência</div>
+            <div class="calib-item-desc">(1) Fica igual se ignorar → (5) Piora devagar → (10) Colapso imediato.</div>
+          </div>
+          <div class="calib-item">
+            <div class="calib-item-title">Esforço (O Divisor)</div>
+            <div class="calib-item-desc">(1) Tarefa de 5 min. → (5) Exige horas de foco → (10) Projeto exaustivo de semanas.</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="div" style="margin: 2rem 0;">
+
+      <div class="support-block">
+        <h3 class="support-title">🛡️ Aviso 1: O Fator Humano</h3>
+        <p class="support-text">O algoritmo <strong>não substitui o seu julgamento</strong>; ele organiza o seu julgamento. A matemática fornece uma régua consistente para combater o estresse, mas a decisão final continua sendo humana.</p>
+      </div>
+
+      <div class="support-block">
+        <h3 class="support-title">⚠️ Aviso 2: Multiplicação vs. Soma</h3>
+        <p class="support-text">Por que multiplicamos em vez de somar? A soma nivela e mascara as variáveis críticas. A multiplicação <strong>pune severamente qualquer fator fraco</strong>. Se um dos pilares for nota 1, o Score despenca. O efeito exponencial cria um abismo visual entre o que é "medíocre" e o que é "vital".</p>
+      </div>
+
+      <div class="support-block">
+        <h3 class="support-title">⚠️ Aviso 3: O Risco da Zona de Conforto</h3>
+        <p class="support-text">Cuidado para não inflar a nota de Confiança apenas porque uma tarefa é "confortável". Confiança mede risco de execução, não preferência pessoal.</p>
+      </div>
+
+      <div class="support-block">
+        <h3 class="support-title">📈 Aviso 4: O Paradoxo do Crescimento</h3>
+        <p class="support-text">Projetos de expansão real frequentemente recebem nota baixa de Confiança não porque são ruins, mas porque você está em um <strong>território novo estratégico</strong>. Nesses casos, a estratégia não é ignorar o projeto — é dividi-lo em partes menores e seguras que elevem gradualmente a sua Confiança. O algoritmo não bloqueia o crescimento; ele sinaliza onde você precisa desenvolver competência antes de escalar.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="flogo">SISTEMA IMPACT</div>
+  <div class="ft">© 2026 Rodrigo Alex Teodoro · Operação Exclusiva.</div>
+  <div class="ft">INFRAESTRUTURA: VERCEL SECURE // STATUS: ONLINE</div>
+</footer>
+
+<script>
+  // Menu Mobile
+  const hbtn = document.getElementById('hbtn');
+  const mmenu = document.getElementById('mmenu');
+  if(hbtn && mmenu) {
+    hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
+  }
+
+  // Lógica da Calculadora IUCTE
+  function calculate() {
+    const i = parseInt(document.getElementById('val-i').value, 10);
+    const u = parseInt(document.getElementById('val-u').value, 10);
+    const c = parseInt(document.getElementById('val-c').value, 10);
+    const t = parseInt(document.getElementById('val-t').value, 10);
+    const e = parseInt(document.getElementById('val-e').value, 10);
+
+    // Atualiza os displays dos valores individuais
+    document.getElementById('disp-i').innerText = i;
+    document.getElementById('disp-u').innerText = u;
+    document.getElementById('disp-c').innerText = c;
+    document.getElementById('disp-t').innerText = t;
+    document.getElementById('disp-e').innerText = e;
+
+    // Cálculo da Fórmula
+    const score = (i * u * c * t) / e;
+    
+    // Formatação de apresentação (arredondar para até 1 casa decimal se necessário)
+    let formattedScore;
+    if (Number.isInteger(score)) {
+      formattedScore = score;
+    } else {
+      formattedScore = score.toFixed(1);
+    }
+    
+    document.getElementById('disp-score').innerText = formattedScore;
+  }
+  
+  // Executar no load para pegar valores iniciais
+  window.onload = calculate;
+</script>
+</body>
+</html>
