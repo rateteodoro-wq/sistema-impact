@@ -1,6 +1,6 @@
 export const config = {
   // Define que esse middleware só vai rodar quando tentarem acessar a página de assinantes ou as ferramentas/calculadora
-  matcher: ['/assinantes.html', '/assinantes', '/calculadora.html', '/calculadora', '/ferramenta-engine.html', '/ferramenta-engine', '/ferramenta-prompt.html', '/ferramenta-prompt'],
+  matcher: ['/assinantes.html', '/assinantes', '/calculadora.html', '/calculadora', '/ferramenta-engine.html', '/ferramenta-engine', '/ferramenta-prompt.html', '/ferramenta-prompt', '/ferramenta-mpv.html', '/ferramenta-mpv'],
 }
 
 export default function middleware(request) {
