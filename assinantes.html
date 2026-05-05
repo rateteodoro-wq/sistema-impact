@@ -73,7 +73,6 @@
     <a href="index.html">← Retornar à Base</a>
     <a href="#ferramentas">Ferramentas</a>
     <a href="#arquivos">Arquivos Confidenciais</a>
-    <a href="#politica-uso">Uso Justo</a>
     <a href="#" onclick="logout()" style="color: var(--gold-bright);">Desconectar</a>
   </div>
   <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -83,7 +82,6 @@
   <a href="index.html" onclick="closeMenu()">← Retornar à Base</a>
   <a href="#ferramentas" onclick="closeMenu()">Ferramentas</a>
   <a href="#arquivos" onclick="closeMenu()">Arquivos Confidenciais</a>
-  <a href="#politica-uso" onclick="closeMenu()">Uso Justo</a>
   <a href="#" onclick="logout(); closeMenu()" style="color: var(--gold-bright);">Desconectar</a>
 </div>
 
@@ -107,7 +105,7 @@
     <div class="ccard">
       <span class="cnum">01</span><span class="ctag">IA // PRODUTIVIDADE</span>
       <h3 class="ctitle">Knowledge Engine v4.0</h3>
-      <p class="cbody">Seu especialista privado. O algoritmo que condensa horas de estudo em minutos. Processe degravações, resuma fluxos pesados e tenha assistência em engenharia mental.</p>
+      <p class="cbody">Seu especialista privado. O algoritmo que condensa horas de estudo em minutos. Processe degravações, resuma fluxos pesados e tenha assistência em engenharia mental baseada na API do Gemini Pro.</p>
       <div style="margin-top: 1.5rem; display: flex; flex-direction: column;">
         <a href="ferramenta-engine.html" class="btn-p">Iniciar Engine →</a>
       </div>
@@ -157,35 +155,6 @@
 </div></section>
 <hr class="div">
 
-<!-- ========== POLÍTICA DE USO JUSTO ========== -->
-<section id="politica-uso"><div class="wrap">
-  <div class="slabel">Termos de Operação</div>
-  <h2 class="stitle">POLÍTICA DE <span>USO JUSTO</span></h2>
-
-  <div style="margin-top:1.5rem; background:var(--card); border:1px solid rgba(212,160,23,.35); border-left:3px solid var(--gold); padding:1.5rem 1.8rem; position:relative;">
-    <span style="font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.2em; color:var(--gold); border:1px solid rgba(212,160,23,.4); padding:3px 10px; display:inline-block; margin-bottom:1rem; background:rgba(212,160,23,.06);">⚠ LEIA ANTES DE OPERAR AS FERRAMENTAS</span>
-
-    <p style="color:var(--dim); font-size:.87rem; line-height:1.85;">
-      O acesso às ferramentas de IA disponíveis nesta área é fornecido no contexto de uma infraestrutura compartilhada com custos operacionais reais.
-      <strong style="color:#c8c8c8; font-weight:500;">O uso excessivo ou automatizado que comprometa a disponibilidade do serviço para outros assinantes, ou que gere custos desproporcionais à operação, poderá resultar na suspensão ou limitação do acesso, sem aviso prévio.</strong>
-    </p>
-
-    <p style="color:var(--dim); font-size:.87rem; line-height:1.85; margin-top:.9rem;">
-      Entende-se como uso excessivo: volume de requisições fora do padrão de uso individual razoável, automações externas que disparem chamadas em loop, ou qualquer uso que não esteja alinhado com a finalidade das ferramentas descritas nesta página.
-    </p>
-
-    <p style="color:var(--dim); font-size:.87rem; line-height:1.85; margin-top:.9rem;">
-      O acesso à área de assinantes pressupõe a leitura e concordância com estes termos. Em caso de dúvidas sobre os limites de uso, entre em contato antes de operações não convencionais.
-    </p>
-
-    <div style="font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.12em; color:rgba(212,160,23,.5); margin-top:1.2rem; border-top:1px solid rgba(212,160,23,.1); padding-top:.8rem;">
-      SISTEMA IMPACT // OPERAÇÃO EXCLUSIVA // ASSINANTES REGISTRADOS
-    </div>
-  </div>
-</div></section>
-<hr class="div">
-<!-- ============================================ -->
-
 <section id="arquivos"><div class="wrap">
   <div class="slabel">Centro de Inteligência</div>
   <h2 class="stitle">ARQUIVOS & <span>AULAS</span></h2>
@@ -222,6 +191,7 @@
   hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
   function closeMenu() { mmenu.classList.remove('open'); }
 
+  // Função de Desconectar (Limpeza de Cache Basic Auth)
   function logout() {
     window.location.href = window.location.protocol + '//sair:sair@' + window.location.host + '/index.html';
   }
