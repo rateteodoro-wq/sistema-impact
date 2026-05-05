@@ -63,6 +63,47 @@
     @media(min-width:768px){ footer{flex-direction:row;justify-content:space-between;text-align:left;} }
     .flogo { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--gold); letter-spacing:.15em; }
     .ft    { font-family:'Share Tech Mono',monospace; font-size:.55rem; color:var(--gold); letter-spacing:.09em; line-height:1.5; }
+    
+    /* Policy Section */
+    .policy-box {
+      border: 1px solid rgba(212,160,23,0.3);
+      padding: 2rem;
+      position: relative;
+      background: rgba(212,160,23,0.02);
+      margin-top: 1.5rem;
+    }
+    .policy-box::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+    }
+    .policy-alert-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-bright);
+      border: 1px solid rgba(212,160,23,0.5);
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .policy-text {
+      color: var(--dim);
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+    .policy-footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(212,160,23,0.1);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.65rem;
+        color: rgba(212,160,23,0.4);
+        letter-spacing: 0.1em;
+    }
   </style>
 </head>
 <body>
@@ -178,6 +219,23 @@
     </div>
   </div>
 </div></section>
+
+<section id="uso-justo">
+  <div class="wrap">
+    <div class="slabel">Termos de Operação</div>
+    <h2 class="stitle">POLÍTICA DE <span>USO JUSTO</span></h2>
+    
+    <div class="policy-box">
+      <div class="policy-alert-label">⚠ LEIA ANTES DE OPERAR AS FERRAMENTAS</div>
+      <p class="policy-text">
+        O acesso às ferramentas baseadas em IA está sujeito a limites de uso razoável. Em caso de utilização excessiva que comprometa a disponibilidade para outros assinantes ou gere custos operacionais desproporcionais, o acesso poderá ser suspenso ou ajustado sem aviso prévio.
+      </p>
+      <div class="policy-footer">
+        SISTEMA IMPACT // OPERAÇÃO EXCLUSIVA // ASSINANTES REGISTRADOS
+      </div>
+    </div>
+  </div>
+</section>
 
 <footer>
   <div class="flogo">SISTEMA IMPACT</div>
