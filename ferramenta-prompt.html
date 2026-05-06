@@ -63,6 +63,9 @@
 </div>
 
 <script>
+  if (sessionStorage.getItem('impact_auth') !== 'true') {
+  window.location.replace('index.html');
+}
   // Menu Mobile
   const hbtn = document.getElementById('hbtn');
   const mmenu = document.getElementById('mmenu');
