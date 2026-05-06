@@ -124,12 +124,44 @@
             background: #1A1A1A;
             border: 1px solid var(--border-gold);
         }
+
+        /* Nav Global */
+        nav { position:fixed; inset:0 0 auto 0; z-index:200; height:52px; display:flex; align-items:center; justify-content:space-between;
+            padding:0 1.1rem; background:rgba(10,10,10,0.96); backdrop-filter:blur(14px); border-bottom:1px solid rgba(212,160,23,0.18); }
+        .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.16em; color:#F5C518; text-decoration: none; }
+        .nav-links { display:none; gap:1.5rem; }
+        .nav-links a { font-family:'Share Tech Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:#888888; text-decoration:none; transition:color .2s; }
+        .nav-links a:hover { color:#F5C518; }
+        .hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+        .hamburger span { display:block; width:22px; height:2px; background:#D4A017; border-radius:2px; }
+        .mobile-menu { display:none; position:fixed; top:52px; left:0; right:0; z-index:199; background:rgba(10,10,10,0.98);
+            border-bottom:1px solid rgba(212,160,23,0.18); padding:1.25rem 1.1rem; flex-direction:column; gap:0; }
+        .mobile-menu.open { display:flex; }
+        .mobile-menu a { font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.12em; text-transform:uppercase;
+            color:#888888; text-decoration:none; padding:.85rem 0; border-bottom:1px solid rgba(212,160,23,0.1); }
+        .mobile-menu a:last-child { border-bottom:none; }
+        @media(min-width:640px){ nav{padding:0 2rem;} .mobile-menu{padding:1.25rem 2rem;} .hamburger{display:none;} .nav-links{display:flex;} .mobile-menu{display:none!important;} }
     </style>
 </head>
 
 <body class="min-h-screen p-4 md:p-8 flex justify-center items-start">
+    <!-- Nav Global -->
+    <nav>
+        <a href="assinantes.html" class="nav-logo">SISTEMA IMPACT</a>
+        <div class="nav-links">
+            <a href="assinantes.html">← Retornar aos Módulos</a>
+            <a href="#" onclick="logout()" style="color: #F5C518;">Desconectar</a>
+        </div>
+        <button class="hamburger" id="hbtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+
+    <div class="mobile-menu" id="mmenu">
+        <a href="assinantes.html">← Retornar aos Módulos</a>
+        <a href="#" onclick="logout(); closeMenu()" style="color: #F5C518;">Desconectar</a>
+    </div>
+
     <div
-        class="w-full max-w-3xl premium-card rounded-2xl p-6 md:p-12 fade-in mt-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
+        class="w-full max-w-3xl premium-card rounded-2xl p-6 md:p-12 fade-in mt-16 md:mt-20 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
 
         <header class="text-center mb-12 border-b border-white/5 pb-10">
             <p class="label-font text-[10px] tracking-[0.3em] text-white/40 mb-2">Sistema Impact // Motor de Priorização
@@ -273,6 +305,19 @@
     </div>
 
     <script>
+        // Menu Mobile Global
+        const hbtn = document.getElementById('hbtn');
+        const mmenu = document.getElementById('mmenu');
+        if(hbtn && mmenu) {
+            hbtn.addEventListener('click', () => mmenu.classList.toggle('open'));
+        }
+        function closeMenu() { if(mmenu) mmenu.classList.remove('open'); }
+
+        // Função de Desconectar Global
+        function logout() {
+            window.location.href = window.location.protocol + '//sair:sair@' + window.location.host + '/index.html';
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const formSection = document.getElementById('form-section');
             const resultsSection = document.getElementById('results-section');
