@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard IMPACT</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Bebas Neue for titles and Share Tech Mono for labels -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --card-bg: #111111;
+            --accent-gold: #F5C518;
+            --border-gold: rgba(212, 160, 23, 0.14);
+            --grid-color: rgba(212, 160, 23, 0.05);
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-color);
+            color: #E2E8F0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+        }
+
+        .title-font {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.05em;
+        }
+
+        .label-font {
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .premium-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(8px);
+        }
+
+        .accent-btn {
+            background-color: var(--accent-gold);
+            color: #000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+        }
+
+        .accent-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 20px rgba(245, 197, 24, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--border-gold);
+            color: var(--accent-gold);
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(245, 197, 24, 0.05);
+            border-color: var(--accent-gold);
+        }
+
+        input,
+        select {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid var(--border-gold) !important;
+            color: white !important;
+            font-family: 'Share Tech Mono', monospace !important;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent-gold) !important;
+            box-shadow: 0 0 10px rgba(245, 197, 24, 0.1) !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden-smooth {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1A1A1A;
+            border: 1px solid var(--border-gold);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 flex justify-center items-start">
+    <div
+        class="w-full max-w-3xl premium-card rounded-2xl p-6 md:p-12 fade-in mt-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
+
+        <header class="text-center mb-12 border-b border-white/5 pb-10">
+            <p class="label-font text-[10px] tracking-[0.3em] text-white/40 mb-2">Sistema Impact // Motor de Priorização
+            </p>
+            <h1 class="text-6xl md:text-7xl font-bold text-[#F5C518] title-font mb-4">Dashboard IMPACT</h1>
+            <p class="label-font text-white/50 text-[11px] max-w-lg mx-auto leading-relaxed">Priorização por energia ·
+                Esforço · Impacto Real</p>
+        </header>
+
+        <!-- Formulário (Entradas de Dados) -->
+        <div id="form-section">
+            <div class="mb-10 p-6 bg-black/20 rounded-xl border border-white/5">
+                <label for="energia"
+                    class="block text-xs font-bold text-[#F5C518]/60 mb-3 label-font tracking-widest">Sua Energia
+                    Atual</label>
+                <div class="relative">
+                    <select id="energia"
+                        class="appearance-none w-full rounded-lg focus:ring-1 focus:ring-[#F5C518] block p-4 pr-10 shadow-sm transition-all outline-none font-medium cursor-pointer">
+                        <option value="Alta">⚡ Alta (Pronto para desafios difíceis)</option>
+                        <option value="Media" selected>⚖️ Média (Focado em custo-benefício)</option>
+                        <option value="Baixa">🔋 Baixa (Precisando de vitórias rápidas)</option>
+                    </select>
+                    <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#F5C518]/40">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl title-font text-[#F5C518]">Suas Tarefas</h2>
+                </div>
+
+                <div id="tasks-container" class="space-y-4">
+                    <!-- Linha de Tarefa Base -->
+                    <div
+                        class="task-row flex flex-col md:flex-row gap-4 p-5 py-6 premium-card rounded-xl transition-all relative group bg-black/10">
+                        <div class="flex-grow">
+                            <label
+                                class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Tarefa
+                                *</label>
+                            <input type="text"
+                                class="task-name w-full rounded-lg sm:text-base p-3 border outline-none transition-all placeholder-white/20"
+                                placeholder="Ex: Escrever relatório mensal..." required>
+                        </div>
+                        <div class="w-full md:w-32">
+                            <label
+                                class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Impacto
+                                <span class="text-[9px] opacity-50">(1-10)</span></label>
+                            <input type="number" min="1" max="10"
+                                class="task-impact w-full rounded-lg sm:text-base p-3 border outline-none transition-all text-center"
+                                value="5" required>
+                        </div>
+                        <div class="w-full md:w-32">
+                            <label
+                                class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Esforço
+                                <span class="text-[9px] opacity-50">(1-10)</span></label>
+                            <input type="number" min="1" max="10"
+                                class="task-effort w-full rounded-lg sm:text-base p-3 border outline-none transition-all text-center"
+                                value="5" required>
+                        </div>
+                        <button type="button"
+                            class="remove-task absolute top-2 right-2 text-white/20 hover:text-[#F5C518] transition-colors p-2 md:static md:self-end md:mb-1 md:opacity-0 group-hover:opacity-100 flex-shrink-0 focus:opacity-100 rounded-lg outline-none"
+                            title="Remover tarefa" onclick="this.parentElement.remove()">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button id="add-task-btn"
+                        class="secondary-btn inline-flex items-center text-[11px] font-bold py-3 px-6 rounded-lg transition-all focus:outline-none label-font tracking-widest">
+                        <svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Adicionar nova linha
+                    </button>
+                </div>
+            </div>
+
+            <button id="prioritize-btn"
+                class="accent-btn w-full py-6 px-6 rounded-xl shadow-xl transform transition hover:-translate-y-1 focus:outline-none text-xl flex justify-center items-center mt-12 title-font">
+                <span>Priorizar Minhas Tarefas</span>
+                <svg class="ml-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Tela de Resultados (Saída de Dados) -->
+        <div id="results-section" class="hidden-smooth">
+            <div class="text-center mb-12">
+                <div
+                    class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#F5C518]/10 text-[#F5C518] mb-6 border border-[#F5C518]/20">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-5xl font-bold text-[#F5C518] title-font mb-4">Seus Próximos Passos</h2>
+                <p class="label-font text-white/40 text-[11px] max-w-md mx-auto leading-relaxed">O motor calculou a
+                    matriz de prioridade baseada na sua energia e relação impacto vs. esforço.</p>
+            </div>
+
+            <div id="results-container" class="space-y-6 mb-12">
+                <!-- Cards de resultados serão injetados via JS -->
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-12 border-t border-white/5">
+                <a href="#"
+                    class="secondary-btn flex justify-center items-center gap-3 py-4 px-6 rounded-xl text-center label-font text-[11px] tracking-widest font-bold">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M4.459 4.208c.745-.636 1.83-.889 3.093-.889h6.126c2.408 0 4.09 1.157 5.097 2.723l.115.186c.338.563.541 1.205.617 1.874l.019.227v9.423c0 1.24-.26 2.373-.918 3.133-.746.862-1.928 1.115-3.192 1.115H9.3c-2.408 0-4.09-1.157-5.098-2.723a4.7 4.7 0 0 1-.722-2.02l-.013-.208v-9.5c0-1.22.257-2.336.907-3.085zm10.74 3.792h-5.41a.75.75 0 0 0-.75.75v5.41a.75.75 0 0 0 1.5 0V10.12l4.13 4.13a.75.75 0 0 0 1.06-1.06l-4.13-4.13h3.6a.75.75 0 0 0 0-1.5z" />
+                    </svg>
+                    Exportar para o Notion
+                </a>
+                <button id="new-session-btn"
+                    class="accent-btn flex justify-center items-center gap-3 py-4 px-6 rounded-xl text-center label-font text-[11px] tracking-widest">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                    Reiniciar Sessão
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formSection = document.getElementById('form-section');
+            const resultsSection = document.getElementById('results-section');
+            const tasksContainer = document.getElementById('tasks-container');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const prioritizeBtn = document.getElementById('prioritize-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const newSessionBtn = document.getElementById('new-session-btn');
+            const energiaSelect = document.getElementById('energia');
+
+            const createTaskRow = () => {
+                const row = document.createElement('div');
+                row.className = 'task-row flex flex-col md:flex-row gap-4 p-5 py-6 premium-card rounded-xl transition-all relative group bg-black/10 fade-in';
+                row.innerHTML = `
+                    <div class="flex-grow">
+                        <label class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Tarefa *</label>
+                        <input type="text" class="task-name w-full rounded-lg sm:text-base p-3 border outline-none transition-all placeholder-white/20" placeholder="Ex: Nova tarefa..." required>
+                    </div>
+                    <div class="w-full md:w-32">
+                        <label class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Impacto <span class="text-[9px] opacity-50">(1-10)</span></label>
+                        <input type="number" min="1" max="10" class="task-impact w-full rounded-lg sm:text-base p-3 border outline-none transition-all text-center" value="5" required>
+                    </div>
+                    <div class="w-full md:w-32">
+                        <label class="block text-[10px] font-bold text-white/30 mb-2 label-font tracking-widest">Esforço <span class="text-[9px] opacity-50">(1-10)</span></label>
+                        <input type="number" min="1" max="10" class="task-effort w-full rounded-lg sm:text-base p-3 border outline-none transition-all text-center" value="5" required>
+                    </div>
+                    <button type="button" class="remove-task absolute top-2 right-2 md:static md:self-end md:mb-1 text-white/20 hover:text-[#F5C518] md:opacity-0 group-hover:opacity-100 transition-all p-2 flex-shrink-0 focus:opacity-100 rounded-lg outline-none" title="Remover tarefa" onclick="this.parentElement.remove()">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                `;
+                return row;
+            };
+
+            addTaskBtn.addEventListener('click', () => {
+                const newRow = createTaskRow();
+                tasksContainer.appendChild(newRow);
+                newRow.querySelector('.task-name').focus();
+            });
+
+            prioritizeBtn.addEventListener('click', () => {
+                const energia = energiaSelect.value;
+                const taskRows = document.querySelectorAll('.task-row');
+                let tasks = [];
+                let isValid = true;
+
+                taskRows.forEach(row => {
+                    const nameInput = row.querySelector('.task-name');
+                    const impactInput = row.querySelector('.task-impact');
+                    const effortInput = row.querySelector('.task-effort');
+
+                    const name = nameInput.value.trim();
+                    const impact = parseFloat(impactInput.value);
+                    const effort = parseFloat(effortInput.value);
+
+                    if (!name) {
+                        nameInput.style.borderColor = "#ff4444";
+                        isValid = false;
+                    } else {
+                        nameInput.style.borderColor = "";
+                    }
+
+                    if (isNaN(impact) || impact < 1 || impact > 10) {
+                        impactInput.style.borderColor = "#ff4444";
+                        isValid = false;
+                    } else {
+                        impactInput.style.borderColor = "";
+                    }
+
+                    if (isNaN(effort) || effort < 1 || effort > 10) {
+                        effortInput.style.borderColor = "#ff4444";
+                        isValid = false;
+                    } else {
+                        effortInput.style.borderColor = "";
+                    }
+
+                    if (name && !isNaN(impact) && !isNaN(effort)) {
+                        const ratio = impact / effort;
+                        const tempoEstimado = effort * 5;
+                        tasks.push({ name, impact, effort, ratio, tempoEstimado });
+                    }
+                });
+
+                if (!isValid) {
+                    alert("Atenção: Preencha todas as tarefas e certifique-se que Impacto e Esforço são valores de 1 a 10.");
+                    return;
+                }
+
+                if (tasks.length === 0) {
+                    alert("Adicione pelo menos uma tarefa para priorizar.");
+                    return;
+                }
+
+                tasks.sort((a, b) => {
+                    if (energia === "Alta") {
+                        if (b.impact !== a.impact) return b.impact - a.impact;
+                        return b.ratio - a.ratio;
+                    } else if (energia === "Baixa") {
+                        if (a.effort !== b.effort) return a.effort - b.effort;
+                        return b.ratio - a.ratio;
+                    } else {
+                        if (b.ratio !== a.ratio) return b.ratio - a.ratio;
+                        return b.impact - a.impact;
+                    }
+                });
+
+                const topTasks = tasks.slice(0, 3);
+                resultsContainer.innerHTML = '';
+
+                topTasks.forEach((task, index) => {
+                    let priorizadoPor = "";
+                    if (energia === "Alta") {
+                        priorizadoPor = "ALTA ENERGIA DETECTADA. FOCO EM ALTO IMPACTO ABSOLUTO.";
+                    } else if (energia === "Baixa") {
+                        priorizadoPor = "BAIXA ENERGIA. TAREFA DE BAIXO ESFORÇO PARA GERAR MOMENTUM.";
+                    } else {
+                        priorizadoPor = "ENERGIA EQUILIBRADA. MAIOR RETORNO (IMPACTO/ESFORÇO) SELECIONADO.";
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = `p-8 premium-card rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 opacity-0 shadow-lg`;
+                    card.style.animation = `fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15 + 0.3}s forwards`;
+
+                    card.innerHTML = `
+                        <div class="flex-grow">
+                            <div class="flex flex-wrap items-center gap-4 mb-4">
+                                <span class="label-font text-[10px] px-3 py-1 bg-[#F5C518] text-black font-bold rounded tracking-widest">${index + 1}º PASSO</span>
+                                <span class="label-font text-[10px] text-[#F5C518]/60 flex items-center border border-[#F5C518]/20 px-3 py-1 rounded">
+                                    <svg class="w-3.5 h-3.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    TEMPO ESTIMADO: ${task.tempoEstimado} MIN
+                                </span>
+                            </div>
+                            <h3 class="text-3xl font-bold text-white title-font leading-tight mb-4">${task.name}</h3>
+                            <p class="label-font text-[10px] text-white/50 tracking-wider bg-white/5 p-4 rounded-lg border border-white/5">
+                                <span class="text-[#F5C518]">ANALISE //</span> ${priorizadoPor}
+                            </p>
+                        </div>
+                        <div class="hidden md:flex flex-col items-center justify-center p-6 bg-[#F5C518]/5 rounded-xl min-w-[120px] border border-[#F5C518]/10">
+                            <span class="text-4xl font-bold text-[#F5C518] title-font">${task.ratio.toFixed(1)}</span>
+                            <span class="label-font text-[9px] text-[#F5C518]/40 tracking-[0.3em] mt-2">RATIO</span>
+                        </div>
+                    `;
+                    resultsContainer.appendChild(card);
+                });
+
+                formSection.style.opacity = '0';
+                setTimeout(() => {
+                    formSection.style.display = 'none';
+                    resultsSection.style.display = 'block';
+                    setTimeout(() => {
+                        resultsSection.style.opacity = '1';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 50);
+                }, 400);
+            });
+
+            newSessionBtn.addEventListener('click', () => {
+                const taskRows = document.querySelectorAll('.task-row');
+                taskRows.forEach((row, index) => {
+                    if (index > 0) {
+                        row.remove();
+                    } else {
+                        row.querySelector('.task-name').value = '';
+                        row.querySelector('.task-impact').value = '5';
+                        row.querySelector('.task-effort').value = '5';
+                    }
+                });
+                energiaSelect.value = 'Media';
+
+                resultsSection.style.opacity = '0';
+                setTimeout(() => {
+                    resultsSection.style.display = 'none';
+                    formSection.style.display = 'block';
+                    setTimeout(() => {
+                        formSection.style.opacity = '1';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 50);
+                }, 400);
+            });
+        });
+    </script>
+</body>
+
+</html>

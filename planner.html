@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMPACT Time Block Planner - Phase 2.2 (Real World)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0A0A0A;
+            background-image: 
+                linear-gradient(rgba(245, 197, 24, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245, 197, 24, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #e2e8f0;
+        }
+
+        .striped-bg {
+            background-image: repeating-linear-gradient(-45deg,
+                    rgba(245, 197, 24, 0.1),
+                    rgba(245, 197, 24, 0.1) 10px,
+                    rgba(0, 0, 0, 0.2) 10px,
+                    rgba(0, 0, 0, 0.2) 20px);
+        }
+
+        .glass-panel {
+            background: rgba(17, 17, 17, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 197, 24, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        /* Scrollbar minimalista dark */
+        .gantt-scroll-area::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .gantt-scroll-area::-webkit-scrollbar-track {
+            background: #111111;
+            border-radius: 6px;
+        }
+
+        .gantt-scroll-area::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 6px;
+            border: 2px solid #111111;
+        }
+
+        .gantt-scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #F5C518;
+        }
+
+        /* Animacoes de bateria dinamica */
+        #battery-fill {
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.8s ease;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 lg:p-12 selection:bg-indigo-500 selection:text-white pb-24">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 glass-panel p-6 rounded-3xl">
+            <div>
+                <div class="flex items-center gap-3 mb-1">
+                    <div
+                        class="h-8 w-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xl">
+                        I
+                    </div>
+                    <h1 class="text-4xl font-extrabold tracking-tight text-yellow-500">IMPACT Planner</h1>
+                </div>
+                <p class="text-sm text-slate-400 font-medium">Motor Dinâmico • Fase 2.2</p>
+            </div>
+
+            <!-- Battery Meter -->
+            <div
+                class="flex items-center gap-4 bg-[#1a1a1a] px-5 py-4 rounded-2xl shadow-sm border border-slate-800 min-w-[280px]">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-yellow-500 uppercase tracking-wider">Bateria Humana</span>
+                        <span id="battery-text" class="text-sm font-bold text-slate-700">100%</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div id="battery-fill" class="h-full rounded-full w-full bg-emerald-500"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- NEW: Configurar meu Dia Form -->
+        <section class="glass-panel p-5 rounded-3xl border border-slate-800 shadow-sm relative z-20">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <h2 class="text-xs font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Configurar meu Dia
+                </h2>
+
+                <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <!-- Tipo de Dia -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Tipo</label>
+                        <select id="config-day-type"
+                            class="bg-[#1a1a1a] border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm w-full sm:min-w-[140px] cursor-pointer">
+                            <option value="util" selected>Dia Útil</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+
+                    <!-- Horário de Início -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label
+                            class="text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Início</label>
+                        <input type="time" id="config-start-time" value="06:00"
+                            class="bg-[#1a1a1a] border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm w-full cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Adicionar ao Dia Form -->
+        <section class="glass-panel p-6 rounded-3xl border border-slate-800 shadow-sm relative overflow-hidden">
+            <!-- Decoration -->
+            <div class="absolute -right-16 -top-16 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+
+            <h2 class="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Adicionar ao Dia
+            </h2>
+
+            <form id="add-task-form" class="flex flex-col md:flex-row gap-4 lg:gap-6 items-end relative z-10">
+                <!-- Tarefa -->
+                <div class="flex-1 w-full relative">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Qual o
+                        foco?</label>
+                    <input type="text" id="input-task"
+                        class="w-full bg-[#1a1a1a] border border-slate-800 text-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all shadow-sm placeholder-slate-600"
+                        placeholder="Ex: Escrever Documentação" required autocomplete="off">
+                </div>
+
+                <!-- NEW: Horário Fixo -->
+                <div class="w-full md:w-32 relative">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Hora Fixa
+                        <span class="text-[9px] lowercase font-normal">(opcional)</span></label>
+                    <input type="time" id="input-fixed-time"
+                        class="w-full bg-[#1a1a1a] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all shadow-sm text-slate-300 cursor-pointer">
+                </div>
+
+                <!-- Duração -->
+                <div class="w-full md:w-32 relative">
+                    <label
+                        class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Horas</label>
+                    <input type="number" id="input-duration" step="0.5" min="0.5"
+                        class="w-full bg-[#1a1a1a] border border-slate-800 text-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all shadow-sm placeholder-slate-600"
+                        placeholder="1.5" required>
+                </div>
+
+                <!-- Energia -->
+                <div class="w-full md:w-48 xl:w-56 relative">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Custo de
+                        Energia</label>
+                    <div class="relative">
+                        <select id="input-energy"
+                            class="appearance-none w-full bg-[#1a1a1a] border border-slate-800 text-slate-200 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all shadow-sm">
+                            <option value="alta-mental">🧠 Alta Energia (Mental) - 25%</option>
+                            <option value="alta-fisica">💪 Alta Energia (Física) - 25%</option>
+                            <option value="media">⚡ Energia Média - 15%</option>
+                            <option value="baixa">🔋 Energia Baixa - 10%</option>
+                            <option value="micro">🤏 Micro-Tarefa (Trivial) - 5%</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
+                    <button type="submit" id="btn-add"
+                        class="flex-1 md:flex-none justify-center bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-6 rounded-xl shadow-lg shadow-yellow-900/20 transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2">
+                        <span>Alocar</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+
+                    <button type="button" id="btn-clear"
+                        class="flex-1 md:flex-none justify-center bg-[#1a1a1a] hover:bg-slate-800 text-slate-400 border border-slate-800 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-2"
+                        title="Limpar Dia">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Main Content: Gantt Chart -->
+        <main class="glass-panel rounded-3xl p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <h2 class="text-lg font-semibold text-yellow-500 flex items-center gap-2">
+                    <span>Cronograma</span>
+                    <span id="badge-day-type"
+                        class="px-2.5 py-1 rounded-md bg-slate-800 text-yellow-500 text-[10px] font-bold uppercase tracking-wide">Dia
+                        Útil</span>
+                </h2>
+
+                <div class="flex flex-wrap gap-4 text-xs font-medium text-slate-400">
+                    <div class="flex items-center gap-2"><span
+                            class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"></span>Boa (&gt;60%)</div>
+                    <div class="flex items-center gap-2"><span
+                            class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm"></span>Média (&gt;30%)</div>
+                    <div class="flex items-center gap-2"><span
+                            class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm"></span>Crítica (&lt;30%)</div>
+                    <div class="flex items-center gap-2"><span
+                            class="w-2.5 h-2.5 rounded-full bg-slate-700 shadow-sm"></span>Bloqueado</div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Timeline Area -->
+    <div class="gantt-scroll-area overflow-x-auto pb-6 relative">
+        <div class="min-w-[1200px] relative mt-10" id="gantt-container">
+
+            <!-- Background Hour Lines -->
+            <div id="timeline-bg" class="absolute inset-0 h-[180px] z-0">
+                <!-- Gerado via JS -->
+            </div>
+
+            <!-- Blocks Container -->
+            <div id="timeline-blocks" class="relative h-[180px] z-10 w-full">
+                <!-- Gerado via JS -->
+            </div>
+
+        </div>
+    </div>
+    </main>
+
+    <!-- Legenda/Regras -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 opacity-75 hover:opacity-100 transition-opacity">
+        <div class="p-5 rounded-2xl bg-[#111111] border border-slate-800">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">
+                🔋 Custos</h3>
+            <ul class="text-[13px] text-slate-600 space-y-1.5">
+                <li><span class="font-semibold text-rose-500">Alta</span>: 25% da bateria.</li>
+                <li><span class="font-semibold text-amber-500">Média</span>: 15% da bateria.</li>
+                <li><span class="font-semibold text-emerald-500">Baixa</span>: 10% da bateria.</li>
+                <li><span class="font-semibold text-slate-500">Micro</span>: 5% da bateria.</li>
+            </ul>
+        </div>
+        <div class="p-5 rounded-2xl bg-[#111111] border border-slate-800">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">
+                🧘 Buffer Físico</h3>
+            <p class="text-[13px] text-slate-600 leading-relaxed">
+                Atividades <span class="font-semibold">"Alta Física"</span> engatilham <span
+                    class="bg-slate-100 font-semibold px-1.5 rounded text-slate-700">+30m descanso</span>
+                inegociável imediatamente após.
+            </p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-700 shadow-lg">
+            <h3 class="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-2">
+                🛑 Limites (Hard Stop)</h3>
+            <p class="text-[13px] text-slate-300 leading-relaxed">
+                Teto final às <span class="text-white font-bold">22:00</span>. Aos domingos, ocorre o <span
+                    class="text-rose-400 font-bold">Family Lockdown</span> às <span
+                    class="text-white font-bold">13:00</span>. Nenhuma tarefa cruza esses limites.
+            </p>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- Global Tooltip Container -->
+    <div id="global-tooltip"
+        class="fixed z-[100] opacity-0 pointer-events-none transform -translate-x-1/2 -translate-y-full transition-opacity duration-200 bg-slate-800 text-white text-xs p-2.5 rounded-lg shadow-xl border border-slate-700 break-words whitespace-normal text-left font-medium w-max max-w-[220px]">
+        <span id="tooltip-text"></span>
+        <div
+            class="absolute w-2.5 h-2.5 bg-slate-800 border-b border-r border-slate-700 transform rotate-45 -bottom-1.5 left-1/2 -translate-x-1/2">
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ----------------------------------------------------
+            // 1. CONFIGURAÇÕES E CONSTANTES
+            // ----------------------------------------------------
+            const END_HOUR = 22;   // 22:00 - Hard stop inegocíavel
+            const SUNDAY_LOCKDOWN_HOUR = 13; // 13:00
+
+            // ----------------------------------------------------
+            // 2. SELETORES DOM
+            // ----------------------------------------------------
+            const configDayType = document.getElementById('config-day-type');
+            const configStartTime = document.getElementById('config-start-time');
+            const badgeDayType = document.getElementById('badge-day-type');
+
+            const form = document.getElementById('add-task-form');
+            const inputTask = document.getElementById('input-task');
+            const inputFixedTime = document.getElementById('input-fixed-time');
+            const inputDuration = document.getElementById('input-duration');
+            const inputEnergy = document.getElementById('input-energy');
+            const btnClear = document.getElementById('btn-clear');
+
+            const timelineBg = document.getElementById('timeline-bg');
+            const timelineBlocks = document.getElementById('timeline-blocks');
+            const batteryFill = document.getElementById('battery-fill');
+            const batteryText = document.getElementById('battery-text');
+
+            // ----------------------------------------------------
+            // 3. ESTADO GLOBAL E CONFIGURAÇÕES DINÂMICAS
+            // ----------------------------------------------------
+            let globalBlocks = [];           // Armazena as tarefas/buffers renderizáveis
+            let currentBattery = 100;        // Bateria global (0 a 100)
+
+            let config = getConfigs();
+            let totalMinutes = (END_HOUR * 60) - config.startMins;
+            let currentCursorMins = config.startMins; // Ponteiro começa do horário definido pelo usuário
+
+            function getConfigs() {
+                const timeVal = configStartTime.value;
+                const [h, m] = timeVal.split(':').map(Number);
+                const startMins = (h * 60) + m;
+
+                const dayType = configDayType.value;
+                return {
+                    startMins,
+                    dayType,
+                    isSunday: dayType === 'domingo'
+                };
+            }
+
+            // ----------------------------------------------------
+            // 4. FUNÇÕES UTILITÁRIAS
+            // ----------------------------------------------------
+            function formatMinsRelToDurationText(mins) {
+                const h = Math.floor(mins / 60);
+                const m = Math.round(mins % 60);
+                return `${h > 0 ? h + 'h' : ''}${m > 0 ? m.toString().padStart(2, '0') : (h > 0 ? '' : '0h')}`;
+            }
+
+            function minsAbsToTime(minsAbs) {
+                const h = Math.floor(minsAbs / 60).toString().padStart(2, '0');
+                const m = Math.round(minsAbs % 60).toString().padStart(2, '0');
+                return `${h}:${m}`;
+            }
+
+            // Sistema de Toasts Elegante
+            function showToast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const isError = type === 'error';
+                const isInfo = type === 'info';
+
+                let colors = '';
+                let icon = '';
+
+                if (isError) {
+                    colors = 'bg-rose-50/95 border-rose-200 text-rose-800 shadow-rose-500/10';
+                    icon = `<svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                } else if (isInfo) {
+                    colors = 'bg-blue-50/95 border-blue-200 text-blue-800 shadow-blue-500/10';
+                    icon = `<svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                } else {
+                    // Success
+                    colors = 'bg-indigo-50/95 border-indigo-200 text-indigo-800 shadow-indigo-500/10';
+                    icon = `<svg class="w-5 h-5 flex-shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                }
+
+                toast.className = `px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-3 border pointer-events-auto backdrop-blur-md ${colors}`;
+                toast.innerHTML = `${icon} <span class="font-medium text-sm">${msg}</span>`;
+                container.appendChild(toast);
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        toast.classList.remove('translate-y-10', 'opacity-0');
+                    });
+                });
+
+                // Animate out
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+
+            // ----------------------------------------------------
+            // 5. MOTOR DE RENDERIZAÇÃO
+            // ----------------------------------------------------
+            function renderGantt() {
+                // Atualiza a badge de topo
+                badgeDayType.innerText = configDayType.options[configDayType.selectedIndex].text;
+
+                // 5.1 Renderizar Fundo (Marcadores de hora e Lockdown)
+                let markersContent = '';
+
+                // Renderiza marcadores de hora começando do config.startMins (arredondando para baixo a hora cheia)
+                const startHourInt = Math.floor(config.startMins / 60);
+                for (let h = startHourInt; h <= END_HOUR; h++) {
+                    const hMins = h * 60;
+                    if (hMins < config.startMins) continue; // Pula se hora for anterior ao início
+
+                    const pct = ((hMins - config.startMins) / totalMinutes) * 100;
+                    const hText = h.toString().padStart(2, '0');
+                    // Fix label clipping for the first item
+                    const alignClass = pct === 0 ? 'translate-x-0 ml-0.5' : '-translate-x-1/2';
+
+                    markersContent += `
+            <div class="absolute top-0 bottom-0 border-l border-slate-800 dashed-line" style="left: ${pct}%; border-left: 1px dashed #334155;">
+              <span class="absolute -top-7 ${alignClass} text-[11px] font-bold text-slate-500 select-none">${hText}:00</span>
+            </div>
+          `;
+                }
+
+                // Renderizar Lockdown APENAS se for domingo e o dia começar antes do lockdown
+                if (config.isSunday) {
+                    const lockdownMins = SUNDAY_LOCKDOWN_HOUR * 60;
+                    if (lockdownMins > config.startMins && lockdownMins < END_HOUR * 60) {
+                        const lockdownStartPct = ((lockdownMins - config.startMins) / totalMinutes) * 100;
+                        markersContent += `
+              <div class="absolute top-0 bottom-0 pointer-events-none transition-all duration-500" style="left: ${lockdownStartPct}%; right: 0; background: repeating-linear-gradient(45deg, rgba(15, 23, 42, 0.03), rgba(15, 23, 42, 0.03) 10px, rgba(15, 23, 42, 0) 10px, rgba(15, 23, 42, 0) 20px);">
+                <div class="absolute inset-y-0 left-0 border-l-2 border-slate-800"></div>
+                <span class="absolute mt-2 ml-4 text-[10px] font-bold text-yellow-500 uppercase tracking-widest px-2.5 py-1 bg-[#1a1a1a]/95 backdrop-blur rounded-md shadow-sm border border-slate-800">
+                  🔒 Family Lockdown
+                </span>
+              </div>
+            `;
+                    }
+                }
+                timelineBg.innerHTML = markersContent;
+
+                // 5.2 Renderizar Blocos
+                let blocksContent = '';
+
+                if (globalBlocks.length === 0) {
+                    blocksContent = `<div class="absolute inset-0 flex items-center justify-center text-slate-400 text-sm font-medium animate-pulse select-none">Agende sua primeira tarefa do dia...</div>`;
+                } else {
+                    globalBlocks.forEach(block => {
+                        const startRelative = block.startMinsAbs - config.startMins;
+                        const startPct = (startRelative / totalMinutes) * 100;
+                        const widthPct = (block.durMins / totalMinutes) * 100;
+
+                        let colorClass = '';
+                        let labelTag = '';
+
+                        if (block.isBuffer) {
+                            colorClass = 'bg-[#1a1a1a] text-slate-400 striped-bg border border-slate-800';
+                            labelTag = 'Buffer';
+                        } else {
+                            labelTag = 'Task';
+                            if (block.batteryAfter > 60) {
+                                colorClass = 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20';
+                            } else if (block.batteryAfter >= 30) {
+                                colorClass = 'bg-amber-400 text-black shadow-lg shadow-amber-400/20';
+                            } else {
+                                colorClass = 'bg-rose-500 text-black shadow-lg shadow-rose-500/20';
+                            }
+                        }
+
+                        const batteryTag = (!block.isBuffer)
+                            ? `<span class="bg-black/10 px-1.5 py-0.5 rounded-sm text-inherit font-bold text-[9px] backdrop-blur-sm -mt-0.5">${block.batteryAfter}% ⚡</span>`
+                            : '';
+
+                        // Determinar se o título é editável (buffer não é)
+                        const titleEditableAttr = block.isBuffer ? '' : `onclick="editTaskTitle(${block.id}, this)"`;
+                        const cursorClass = block.isBuffer ? 'cursor-default' : 'cursor-text';
+
+                        blocksContent += `
+               <div class="absolute top-6 bottom-6 rounded-xl p-3 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:z-20 hover:shadow-xl ${colorClass}" 
+                    style="left: ${startPct}%; width: calc(${widthPct}% - 4px);" data-task-id="${block.id}" data-task-title="${block.title.replace(/"/g, '&quot;')}">
+                 
+                 <div class="w-full flex justify-between items-start mb-1 pointer-events-none">
+                   <div class="flex items-center gap-1.5">
+                     <span class="text-[9px] font-bold uppercase tracking-widest opacity-80 bg-white/20 px-1.5 py-0.5 rounded-sm flex-shrink-0">
+                       ${minsAbsToTime(block.startMinsAbs)}
+                     </span>
+                     <span class="text-[9px] font-bold uppercase tracking-widest opacity-60 hidden md:inline-block">${labelTag}</span>
+                   </div>
+                   ${batteryTag}
+                 </div>
+                 
+                 <div class="relative w-full mt-1 mb-2">
+                    <h3 class="${block.isBuffer ? 'text-xs opacity-90' : 'text-sm hover:underline decoration-white/50'} font-semibold leading-tight line-clamp-2 ${cursorClass}" ${titleEditableAttr} title="Clique para editar">
+                        ${block.title}
+                    </h3>
+                 </div>
+                 
+                 <div class="mt-auto text-[11px] font-medium opacity-90 flex items-center gap-1.5 pointer-events-none">
+                   <svg class="w-3 h-3 opacity-75 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    ${formatMinsRelToDurationText(block.durMins)}
+                 </div>
+               </div>
+             `;
+                    });
+                }
+                timelineBlocks.innerHTML = blocksContent;
+
+                // 5.3 Renderizar Bateria Global
+                batteryText.innerText = currentBattery + '%';
+                batteryFill.style.width = `${currentBattery}%`;
+
+                batteryFill.classList.remove('bg-emerald-500', 'bg-amber-400', 'bg-rose-500');
+                if (currentBattery < 30) {
+                    batteryFill.classList.add('bg-rose-500');
+                } else if (currentBattery <= 60) {
+                    batteryFill.classList.add('bg-amber-400');
+                } else {
+                    batteryFill.classList.add('bg-emerald-500');
+                }
+            }
+
+            // ----------------------------------------------------
+            // 6. EVENTOS DE RESIZE/CONFIGURAR O DIA E EDIÇÃO IN-LINE
+            // ----------------------------------------------------
+
+            // Função Exposta globalmente para ser chamada pelo HTML injetado
+            window.editTaskTitle = function (id, element) {
+                // Impede múltiplos inputs
+                if (element.querySelector('input')) return;
+
+                const task = globalBlocks.find(b => b.id === id);
+                if (!task) return;
+
+                const currentText = task.title;
+
+                // Transforma o H3 em um input
+                const inputHtml = `<input type="text" class="w-full bg-black/40 text-inherit text-sm font-semibold p-1 -ml-1 rounded border border-yellow-500/40 focus:outline-none focus:bg-slate-900 focus:text-white placeholder-white/30" value="${currentText.replace(/"/g, '&quot;')}" />`;
+                element.innerHTML = inputHtml;
+
+                const inputEl = element.querySelector('input');
+                inputEl.focus();
+
+                // Mover cursor para o final
+                inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+
+                // Salvar ao perder o foco ou apertar Enter
+                const saveEdit = () => {
+                    const newText = inputEl.value.trim();
+                    if (newText) {
+                        task.title = newText;
+                        showToast('Tarefa atualizada.', 'success');
+                    }
+                    renderGantt(); // Re-renderiza tudo, destruindo o input
+                };
+
+                inputEl.addEventListener('blur', saveEdit);
+                inputEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inputEl.blur(); // Dispara o blur que já chama saveEdit
+                    }
+                    if (e.key === 'Escape') {
+                        // Cancela edição
+                        renderGantt();
+                    }
+                });
+            };
+
+            function applyReset(isSilent = false) {
+                config = getConfigs();
+
+                // Bloquear horários de início irreais
+                if (config.startMins >= END_HOUR * 60) {
+                    showToast('O horário de início deve ser antes do limite de 22:00.', 'error');
+                    configStartTime.value = "06:00";
+                    config = getConfigs();
+                }
+
+                totalMinutes = (END_HOUR * 60) - config.startMins;
+
+                // Reset da fila real
+                globalBlocks = [];
+                currentBattery = 100;
+                currentCursorMins = config.startMins;
+
+                renderGantt();
+
+                if (!isSilent) {
+                    showToast('Configurações atualizadas. Seu dia foi resetado.', 'info');
+                }
+            }
+
+            configDayType.addEventListener('change', () => applyReset(false));
+            configStartTime.addEventListener('change', () => applyReset(false));
+
+            // ----------------------------------------------------
+            // 7. EVENTOS E LÓGICA DE NEGÓCIO (ADD TASK)
+            // ----------------------------------------------------
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const title = inputTask.value.trim();
+                const durHours = parseFloat(inputDuration.value);
+                const energyType = inputEnergy.value;
+                const fixedTimeVal = inputFixedTime.value; // Valor do novo input de horário fixo
+
+                // Validação Base
+                if (!title || isNaN(durHours) || durHours <= 0) {
+                    showToast('Preencha os dados corretamente. Duração deve ser maior que 0.', 'error');
+                    return;
+                }
+
+                const durMins = durHours * 60;
+
+                // == NOVA LÓGICA DE AGENDAMENTO COM HORÁRIO FIXO ==
+                let startMinsAbsForThisTask = currentCursorMins;
+
+                if (fixedTimeVal) {
+                    const [fh, fm] = fixedTimeVal.split(':').map(Number);
+                    const fixedMinsAbs = (fh * 60) + fm;
+
+                    if (fixedMinsAbs < config.startMins) {
+                        showToast(`Horário fixo não pode ser anterior ao início do seu dia (${minsAbsToTime(config.startMins)}).`, 'error');
+                        return;
+                    }
+
+                    // A tarefa assume a posição exata do horário fixo
+                    startMinsAbsForThisTask = fixedMinsAbs;
+                }
+
+                const taskEndAbs = startMinsAbsForThisTask + durMins;
+
+                // Regra: Hard Stop 22h00
+                if (taskEndAbs > END_HOUR * 60) {
+                    showToast(`Hard Stop! Essa tarefa esbarra no limite das ${END_HOUR}:00.`, 'error');
+                    return;
+                }
+
+                // Regra: Domingo Family Lockdown 13h00 (SOMENTE SE FOR DOMINGO)
+                if (config.isSunday) {
+                    const lockdownMins = SUNDAY_LOCKDOWN_HOUR * 60;
+                    if (startMinsAbsForThisTask < lockdownMins && taskEndAbs > lockdownMins) {
+                        showToast('Family Lockdown! Essa tarefa invade o horário protegido para a família.', 'error');
+                        return;
+                    }
+                    if (startMinsAbsForThisTask >= lockdownMins) {
+                        showToast('Family Lockdown ativado às 13:00. É hora de desconectar.', 'error');
+                        return;
+                    }
+                }
+
+                // Cálculo Financeiro de Energia
+                let cost = 0;
+                if (energyType.includes('alta')) cost = 25;
+                else if (energyType === 'media') cost = 15;
+                else if (energyType === 'baixa') cost = 10;
+                else if (energyType === 'micro') cost = 5;
+
+                // Regra de Bateria Esgotada
+                if (currentBattery - cost < 0) {
+                    showToast('Bateria insuficiente! Seu corpo não aguenta mais essa demanda hoje.', 'error');
+                    return;
+                }
+
+                // Transação Aceita: Alocar Tarefa
+                currentBattery -= cost;
+
+                const newTask = {
+                    id: Date.now(),
+                    title: title,
+                    startMinsAbs: startMinsAbsForThisTask,
+                    durMins: durMins,
+                    energy: energyType,
+                    batteryAfter: currentBattery,
+                    type: 'task',
+                    isBuffer: false
+                };
+
+                globalBlocks.push(newTask);
+
+                // O CurrentCursorMins avança baseado no término LÁ NA FRENTE
+                // Se o usuário usou um horário fixo no futuro, o cursor avança para o fim daquela tarefa
+                // Se usou um evento atrasado, mantemos a fronteira futura inalterada para as próximas fluírem corretamente.
+                currentCursorMins = Math.max(currentCursorMins, taskEndAbs);
+
+                // Regra: Buffer de Recuperação Física
+                if (energyType === 'alta-fisica') {
+                    // Buffer sempre segue a própria tarefa fisicamente exigente
+                    let bufferStartAbs = taskEndAbs;
+                    let bufferEndAbs = bufferStartAbs + 30;
+                    let bufferDur = 30;
+
+                    // Truncar buffer se colidir com os Hard Stops ou Lockdown
+                    if (config.isSunday && bufferStartAbs < SUNDAY_LOCKDOWN_HOUR * 60) {
+                        if (bufferEndAbs > SUNDAY_LOCKDOWN_HOUR * 60) {
+                            bufferDur = (SUNDAY_LOCKDOWN_HOUR * 60) - bufferStartAbs;
+                        }
+                    } else if (bufferEndAbs > END_HOUR * 60) {
+                        bufferDur = (END_HOUR * 60) - bufferStartAbs;
+                    }
+
+                    if (bufferDur > 0) {
+                        globalBlocks.push({
+                            id: Date.now() + 1,
+                            title: 'Descanso Obrigatório',
+                            startMinsAbs: bufferStartAbs,
+                            durMins: bufferDur,
+                            type: 'buffer',
+                            isBuffer: true
+                        });
+                        // Assim como a tarefa, o buffer também pode empurrar a fronteira fluida global
+                        currentCursorMins = Math.max(currentCursorMins, bufferStartAbs + bufferDur);
+                    }
+                }
+
+                // Atualizar Tela
+                renderGantt();
+                showToast(`"${title}" alocada com sucesso!`, 'success');
+
+                // Reset Formulário
+                inputTask.value = '';
+                inputFixedTime.value = '';
+                inputTask.focus();
+            });
+
+            // ----------------------------------------------------
+            // 8. EVENTOS (CLEAR DIA) E TOOLTIP GLOBAL
+            // ----------------------------------------------------
+            btnClear.addEventListener('click', () => {
+                if (globalBlocks.length === 0 && currentBattery === 100) return;
+
+                applyReset(true); // silent
+                showToast('O Gantt foi zerado. Você recuperou 100% de energia!', 'info');
+            });
+
+            // Lógica do Tooltip Flutuante Dinâmico
+            const globalTooltip = document.getElementById('global-tooltip');
+            const tooltipText = document.getElementById('tooltip-text');
+            let tooltipTimeout;
+
+            timelineBlocks.addEventListener('mouseover', (e) => {
+                const blockDiv = e.target.closest('[data-task-id]');
+                if (!blockDiv) return;
+
+                const text = blockDiv.getAttribute('data-task-title');
+                if (!text) return;
+
+                // Se está editando in-line, não mostra o tooltip
+                if (blockDiv.querySelector('input')) {
+                    globalTooltip.classList.add('opacity-0');
+                    return;
+                }
+
+                tooltipText.textContent = text;
+
+                clearTimeout(tooltipTimeout);
+
+                const rect = blockDiv.getBoundingClientRect();
+
+                // Posicionar no meio do horizontal (-translate-x-1/2 já resolve o X, e -translate-y-full resolve o Y)
+                // rect.top já considera o scroll vertical do window.
+                const topP = rect.top - 8; // 8px de respiro colado ao topo da barra
+                const leftP = rect.left + (rect.width / 2);
+
+                globalTooltip.style.top = `${topP}px`;
+                globalTooltip.style.left = `${leftP}px`;
+                globalTooltip.classList.remove('opacity-0');
+            });
+
+            timelineBlocks.addEventListener('mouseout', (e) => {
+                const blockDiv = e.target.closest('[data-task-id]');
+                if (!blockDiv) return;
+
+                tooltipTimeout = setTimeout(() => {
+                    globalTooltip.classList.add('opacity-0');
+                }, 100);
+            });
+
+            // Inicializar Vazio com os dados padrão
+            renderGantt();
+        });
+    </script>
+</body>
+
+</html>
+ 
